@@ -9,8 +9,8 @@ on:
         description: "The name of the integration (e.g., my-integration)"
         
 env:
-  REGISTRY: "ghcr.io"
-  IMAGE_NAME: ${{ REGISTRY }}/${{ github.repository }}/hamqtt-integration-${{ inputs.integration_name }}
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/hamqtt-integration-${{ inputs.integration_name }}
 
 jobs:
   build-and-push:
@@ -40,7 +40,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
