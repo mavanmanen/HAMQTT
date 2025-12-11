@@ -6,8 +6,8 @@ on:
     branches: [ "main" ]
     tags: [ 'v*.*.*' ]
     paths:
-      - HAMQTT.Integration/**
-      - HAMQTT.Integration.Oxxio/**
+      - src/HAMQTT.Integration/**
+      - src/HAMQTT.Integration.Oxxio/**
 jobs:
   build:
     name: Integration Workflow

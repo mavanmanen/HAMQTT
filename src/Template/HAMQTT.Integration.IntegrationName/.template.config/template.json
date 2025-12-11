@@ -15,7 +15,17 @@
   "sources": [
     {
       "source": "./",
-      "target": "./"
+      "target": "./",
+      "include": [ "**/*" ],
+      "exclude": [
+        "**/[Bb]in/**",
+        "**/[Oo]bj/**",
+        ".template.config/**/*",
+        "**/*.filelist",
+        "**/*.user",
+        "**/*.lock.json",
+        "**/workflows/**"
+      ]
     },
     {
       "source": "./HAMQTT.Integration.IntegrationName/workflows",
@@ -141,7 +151,10 @@
       "description": "Set your MQTT Password securely",
       "manualInstructions": [
         {
-          "text": "Project created! To set your MQTT password securely, run:\ndotnet user-secrets set 'MQTT_PASSWORD' 'YOUR_SECURE_PASSWORD'"
+          "text": "Project created! To set your MQTT password securely, run:"
+        },
+        {
+          "text": "dotnet user-secrets set 'MQTT_PASSWORD' 'YOUR_SECURE_PASSWORD'"
         }
       ]
     }
