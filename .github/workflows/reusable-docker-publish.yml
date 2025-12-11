@@ -10,7 +10,7 @@ on:
         
 env:
   REGISTRY: "ghcr.io"
-  IMAGE_NAME: ${{ env.REGISTRY }}/${{ github.repository }}/hamqtt-integration-${{ inputs.integration_name }}
+  IMAGE_NAME: ${{ REGISTRY }}/${{ github.repository }}/hamqtt-integration-${{ inputs.integration_name }}
 
 jobs:
   build-and-push:
