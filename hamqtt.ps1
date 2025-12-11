@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Main CLI entry point for the HAMQTT utility.
@@ -61,9 +62,21 @@ if ([string]::IsNullOrWhiteSpace($Context) -and -not (Test-Path $ScriptsDir)) {
             # 3. Cleanup
             Remove-Item -Path $TempDir -Recurse -Force
             
+            # 4. Unix Permissions Fix (if on Linux/Mac)
+            if ($IsLinux -or $IsMacOS) {
+                try {
+                    $WrapperPath = Join-Path $PSScriptRoot "hamqtt"
+                    if (Test-Path $WrapperPath) {
+                        chmod +x $WrapperPath
+                    }
+                } catch { 
+                    # Ignore permission errors on bootstrap
+                }
+            }
+
             Write-Host "   ✅ Repository pulled successfully." -ForegroundColor Green
             
-            # 4. Auto-trigger init
+            # 5. Auto-trigger init
             $Context = "init"
             $ScriptsDir = Join-Path $PSScriptRoot "scripts"
         }
@@ -139,6 +152,7 @@ switch ($Context) {
             $UpdateSafelist = @(
                 ".gitignore",
                 "hamqtt.bat",
+                "hamqtt",       # <--- ADDED: Unix Shell Wrapper
                 "hamqtt.ps1",
                 "scripts",
                 "src/HAMQTT.Integration",
@@ -194,7 +208,20 @@ switch ($Context) {
                     }
                 }
 
-                # 3. Cleanup
+                # 3. Unix Permissions Fix (if on Linux/Mac) after update
+                if ($IsLinux -or $IsMacOS) {
+                    try {
+                        $WrapperPath = Join-Path $PSScriptRoot "hamqtt"
+                        if (Test-Path $WrapperPath) {
+                            chmod +x $WrapperPath
+                            Write-Host "      ✅ Restored executable permissions for 'hamqtt'" -ForegroundColor Green
+                        }
+                    } catch { 
+                         Write-Warning "      ⚠️  Could not set +x on 'hamqtt' wrapper."
+                    }
+                }
+
+                # 4. Cleanup
                 Remove-Item -Path $TempDir -Recurse -Force
                 Write-Host "`n✨ Core update complete!" -ForegroundColor Cyan
 

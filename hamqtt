@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# 1. Check if PowerShell Core is installed
+if ! command -v pwsh &> /dev/null; then
+    echo "❌ PowerShell Core (pwsh) is not installed."
+    echo "   Please install it to run these tools."
+    echo "   macOS: brew install --cask powershell"
+    echo "   Linux: sudo apt-get install -y powershell"
+    exit 1
+fi
+
+# 2. Resolve Script Directory
+# Ensures we find hamqtt.ps1 even if called from another folder
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# 3. Pass execution to PowerShell script
+# "$@" passes all arguments provided to this script
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$SCRIPT_DIR/hamqtt.ps1" "$@"
