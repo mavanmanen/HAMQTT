@@ -6,6 +6,7 @@ on:
     branches: [ "main" ]
     tags: [ 'v*.*.*' ]
     paths:
+      - HAMQTT.Integration/**
       - HAMQTT.Integration.Oxxio/**
 jobs:
   build:
