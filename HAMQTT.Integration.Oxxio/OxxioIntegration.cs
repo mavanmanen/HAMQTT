@@ -24,7 +24,7 @@ internal sealed class OxxioIntegration(OxxioApi api, IMqttConnectionService mqtt
             },
             Origin = new MqttDiscoveryConfigOrigin
             {
-                Name = "HAMQTT.Integration.Oxxio"
+                Name = "HAMQTT.Integration.Template"
             },
             StateTopic = StateTopic
         };

@@ -1,3 +1,4 @@
+using System.Reflection;
 using Coravel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +14,7 @@ public static class IntegrationApp
     {
         var builder = WebApplication.CreateSlimBuilder();
         builder.Configuration.AddEnvironmentVariables();
+        builder.Configuration.AddUserSecrets(Assembly.GetEntryAssembly()!);
         builder.Services.AddMqttConnection().Configure(options =>
         {
             options.NodeId = builder.Configuration["MQTT_NODE_ID"]!;

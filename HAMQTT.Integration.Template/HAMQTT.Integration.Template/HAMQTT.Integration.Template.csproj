@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <UserSecretsId>61db0b37-6054-48a0-8398-280c174e7fed</UserSecretsId>
+        <UserSecretsId>USER_SECRETS_ID</UserSecretsId>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -14,12 +14,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\HAMQTT.Integration\HAMQTT.Integration.csproj" />
+      <ProjectReference Include="..\..\HAMQTT.Integration\HAMQTT.Integration.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove=".dockerignore" />
-      <Content Include=".dockerignore" />
+      <None Include=".template.config\template.json" />
     </ItemGroup>
 
 </Project>
