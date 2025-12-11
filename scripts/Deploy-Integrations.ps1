@@ -64,8 +64,8 @@ foreach ($dir in $Integrations) {
         continue
     }
 
-    # Use shared function to get clean name
-    $CleanName = Get-CleanIntegrationName $dir.Name
+    # Use regex anchor ^ and escape the dots \. to correctly remove the prefix
+    $CleanName = $dir.Name -replace "^HAMQTT\.Integration\.", ""
     $KebabName = Get-KebabCase $CleanName
     $ImageUrl = "${ImageBaseUrl}/${KebabName}:latest"
 

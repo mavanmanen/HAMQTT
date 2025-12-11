@@ -41,8 +41,10 @@ if (Test-Path $DevComposePath) {
 # --- 3. Parse Prod Compose (Services) ---
 $ProdServices = @()
 if (Test-Path $ProdComposePath) {
-    $ProdContent = Get-Content $ProdComposePath -Raw
-    $ProdServices = $ProdContent | Select-String -Pattern "^\s+hamqtt-integration-([a-zA-Z0-9-]+):" -AllMatches | ForEach-Object { $_.Matches.Groups[1].Value }
+    # CHANGED: Removed -Raw to read as array of lines.
+    # This ensures the regex ^ anchor matches the start of every line, not just the start of the file.
+    $ProdContent = Get-Content $ProdComposePath
+    $ProdServices = $ProdContent | Select-String -Pattern "^\s+hamqtt-integration-([a-zA-Z0-9-]+):" | ForEach-Object { $_.Matches.Groups[1].Value }
 }
 
 # --- 4. Build Status Table ---

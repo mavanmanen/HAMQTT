@@ -6,7 +6,8 @@
 #>
 
 param (
-    [Parameter(Mandatory=$true)]
+    # Changed to False to allow custom interactive prompt
+    [Parameter(Mandatory=$false)]
     [string]$IntegrationName
 )
 
@@ -19,6 +20,53 @@ Assert-HamqttWrapper
 # --- Constants ---
 $RootComposePath = Join-Path $ProjectRoot "src/docker-compose.dev.yml"
 $SrcPath = Join-Path $ProjectRoot "src"
+
+# --- Interactive Mode ---
+if ([string]::IsNullOrWhiteSpace($IntegrationName)) {
+    if (-not (Test-Path $SrcPath)) {
+        Write-Error "Source directory not found."
+        exit 1
+    }
+
+    # Get list of integrations (excluding base project)
+    $Integrations = Get-ChildItem -Path $SrcPath -Directory -Filter "HAMQTT.Integration.*" | 
+                    Where-Object { $_.Name -ne "HAMQTT.Integration" }
+
+    if ($Integrations.Count -eq 0) {
+        Write-Warning "No integrations found to remove."
+        exit 0
+    }
+
+    Write-Host "🗑️  Select an integration to remove:" -ForegroundColor Cyan
+    
+    $Map = @{}
+    $Index = 1
+
+    foreach ($dir in $Integrations) {
+        $CleanName = Get-CleanIntegrationName $dir.Name
+        Write-Host "   [$Index] $CleanName"
+        $Map[$Index] = $CleanName
+        $Index++
+    }
+
+    $Selection = Read-Host "`n   > Enter number or name"
+
+    # Validate Selection
+    if ($Selection -match "^\d+$" -and $Map.ContainsKey([int]$Selection)) {
+        # User entered a valid number
+        $IntegrationName = $Map[[int]$Selection]
+    }
+    elseif ($Integrations | Where-Object { (Get-CleanIntegrationName $_.Name) -eq $Selection }) {
+        # User entered a valid name
+        $IntegrationName = $Selection
+    }
+    else {
+        Write-Error "Invalid selection."
+        exit 1
+    }
+    
+    Write-Host "   Selected: $IntegrationName" -ForegroundColor Gray
+}
 
 # --- 1. Identify Paths ---
 $ProjectFolderName = "HAMQTT.Integration.${IntegrationName}"
