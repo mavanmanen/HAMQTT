@@ -18,4 +18,10 @@
       <ProjectReference Include="..\..\..\HAMQTT.Integration\HAMQTT.Integration.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include=".\workflows\integration-name.yml">
+        <Link>.github/integration-name.yml</Link>
+      </Content>
+    </ItemGroup>
+
 </Project>

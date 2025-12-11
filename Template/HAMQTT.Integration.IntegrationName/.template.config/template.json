@@ -12,6 +12,16 @@
     "type": "project"
   },
   "shortName": "hamqtt-integration",
+  "sources": [
+    {
+      "source": "./",
+      "target": "./"
+    },
+    {
+      "source": "./HAMQTT.Integration.IntegrationName/workflows",
+      "target": "./.github/workflows"
+    }
+  ],
   "primaryOutputs": [
     {
       "path": "HAMQTT.Integration.IntegrationName/HAMQTT.Integration.IntegrationName.csproj"
@@ -50,6 +60,12 @@
       "isHidden": "true",
       "replaces": "..\\..\\..\\HAMQTT.Integration\\HAMQTT.Integration.csproj",
       "defaultValue": "..\\HAMQTT.Integration\\HAMQTT.Integration.csproj"
+    },
+    "FixGithubActionReference": {
+      "type": "parameter",
+      "isHidden": "true",
+      "replaces": ".\\workflows",
+      "defaultValue": "..\\.github\\workflows"
     },
     "ReplaceUppercaseWithUnderscore": {
       "type": "generated",
@@ -90,6 +106,7 @@
       "type": "generated",
       "generator": "casing",
       "replaces": "integration-name",
+      "fileRename": "integration-name",
       "parameters": {
         "source": "ReplacesUppercaseWithDash",
         "toLower": true

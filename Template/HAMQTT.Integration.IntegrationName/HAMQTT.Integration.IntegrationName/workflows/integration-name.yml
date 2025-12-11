@@ -1,0 +1,16 @@
+name: HAMQTT Integration Workflow - IntegrationName
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    tags: [ 'v*.*.*' ]
+    paths:
+      - HAMQTT.Integration/**
+      - HAMQTT.Integration.IntegrationName/**
+jobs:
+  build:
+    name: Integration Workflow
+    uses: mavanmanen/.github/.github/workflows/hamqtt-integration-workflow.yml@main
+    with:
+      name: integration-name
