@@ -11,7 +11,7 @@ on:
 jobs:
   build-and-push:
     env:
-      REGISTRY: ghcr.io
+      REGISTRY: "ghcr.io"
       IMAGE_NAME: ${{ env.REGISTRY }}/${{ github.repository }}/hamqtt-integration-${{ inputs.image_name }}
       
     runs-on: ubuntu-latest
