@@ -7,7 +7,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{F92A52A2-3B1A-49E4-8DD8-979439077108}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		 template.json = Template\HAMQTT.Integration.IntegrationName\.template.config\template.json
+			template.json = Template\HAMQTT.Integration.IntegrationName\.template.config\template.json
+		.github\workflows\hamqtt-integration-workflow.yml = .github\workflows\hamqtt-integration-workflow.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HAMQTT.Integration.IntegrationName", "Template\HAMQTT.Integration.IntegrationName\HAMQTT.Integration.IntegrationName\HAMQTT.Integration.IntegrationName.csproj", "{4FF841EF-4C3E-4254-8590-22873CDC3F40}"
