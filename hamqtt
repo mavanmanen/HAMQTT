@@ -4,8 +4,14 @@
 if ! command -v pwsh &> /dev/null; then
     echo "❌ PowerShell Core (pwsh) is not installed."
     echo "   Please install it to run these tools."
-    echo "   macOS: brew install --cask powershell"
-    echo "   Linux: sudo apt-get install -y powershell"
+    echo ""
+    echo "   --- Installation Options ---"
+    echo "   macOS (Homebrew):   brew install --cask powershell"
+    echo "   Ubuntu/Debian:      sudo apt-get install -y powershell"
+    echo "   Fedora/RHEL:        sudo dnf install -y powershell"
+    echo "   Arch Linux:         sudo pacman -S powershell"
+    echo "   Snap (Universal):   sudo snap install powershell --classic"
+    echo "   Dotnet Global Tool: dotnet tool install --global PowerShell"
     exit 1
 fi
 
