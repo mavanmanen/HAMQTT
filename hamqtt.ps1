@@ -246,12 +246,20 @@ switch ($Context) {
 
     "template" {
         $PackageId = "HAMQTT.Integration.Template"
+        $ShortName = "hamqtt-integration" # Short name as defined in the template config
         $NuGetSource = "https://nuget.pkg.github.com/mavanmanen/index.json"
 
         switch ($Command) {
             "install" {
-                Write-Host "📦 Installing template from NuGet..." -ForegroundColor Cyan
-                dotnet new install $PackageId --nuget-source $NuGetSource
+                Write-Host "📦 Checking template status..." -ForegroundColor Cyan
+                $List = dotnet new list --columns short-name | Out-String
+                
+                if ($List -match $ShortName) {
+                     Write-Host "   ✅ Template '$PackageId' is already installed." -ForegroundColor Green
+                } else {
+                     Write-Host "   Installing template from NuGet..." -ForegroundColor Cyan
+                     dotnet new install $PackageId --nuget-source $NuGetSource
+                }
             }
             "update" {
                 Write-Host "📦 Updating template from NuGet..." -ForegroundColor Cyan
