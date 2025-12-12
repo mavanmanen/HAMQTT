@@ -252,7 +252,7 @@ switch ($Context) {
         switch ($Command) {
             "install" {
                 Write-Host "📦 Checking template status..." -ForegroundColor Cyan
-                $List = dotnet new list --columns short-name | Out-String
+                $List = dotnet new list | Out-String
                 
                 if ($List -match $ShortName) {
                      Write-Host "   ✅ Template '$PackageId' is already installed." -ForegroundColor Green
