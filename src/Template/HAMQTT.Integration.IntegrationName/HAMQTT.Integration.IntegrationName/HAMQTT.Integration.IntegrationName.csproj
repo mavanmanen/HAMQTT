@@ -15,13 +15,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\HAMQTT.Integration\HAMQTT.Integration.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Include=".\workflows\integration-name.yml">
         <Link>.github/integration-name.yml</Link>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="HAMQTT.Integration" Version="1.0.0" />
     </ItemGroup>
 
 </Project>

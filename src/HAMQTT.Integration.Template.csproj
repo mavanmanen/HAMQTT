@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <PackageType>Template</PackageType>
+        <PackageVersion>1.0.0</PackageVersion>
+        <PackageId>HAMQTT.Integration.Template</PackageId>
+        <Title>HAMQTT Integration Template</Title>
+        <Authors>mavanmanen</Authors>
+        <Description>Template for creating a new HAMQTT integration</Description>
+        <PackageTags>dotnet-new;templates</PackageTags>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <IncludeContentInPack>true</IncludeContentInPack>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <ContentTargetFolders>content</ContentTargetFolders>
+        <PackageProjectUrl>https://github.com/mavanmanen/HAMQTT</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/mavanmanen/HAMQTT</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <Content Include="Template\**\*" Exclude="Template\**\bin\**;Template\**\obj\**"/>
+        <Compile Remove="**\*" />
+        <None Remove="HAMQTT.Integration\**;.gitignore;Template\**\bin\**;Template\**\obj\**" />
+    </ItemGroup>
+</Project>

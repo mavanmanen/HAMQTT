@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Template", "Template", "{60
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HAMQTT.Integration.IntegrationName", "Template\HAMQTT.Integration.IntegrationName\HAMQTT.Integration.IntegrationName\HAMQTT.Integration.IntegrationName.csproj", "{DB2DCB3C-3FDE-4848-9744-ACAB2F936788}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HAMQTT.Integration.Template", "HAMQTT.Integration.Template.csproj", "{E693B78E-3758-44CB-A497-320E9C70DC8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,18 @@ Global
 		{DB2DCB3C-3FDE-4848-9744-ACAB2F936788}.Release|x64.Build.0 = Release|Any CPU
 		{DB2DCB3C-3FDE-4848-9744-ACAB2F936788}.Release|x86.ActiveCfg = Release|Any CPU
 		{DB2DCB3C-3FDE-4848-9744-ACAB2F936788}.Release|x86.Build.0 = Release|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Debug|x64.Build.0 = Debug|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Debug|x86.Build.0 = Debug|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Release|x64.ActiveCfg = Release|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Release|x64.Build.0 = Release|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Release|x86.ActiveCfg = Release|Any CPU
+		{E693B78E-3758-44CB-A497-320E9C70DC8F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
