@@ -230,7 +230,10 @@ switch ($Context) {
                 Write-Host "`n📦 Checking for template updates..." -ForegroundColor Cyan
                 $PackageId = "HAMQTT.Integration.Template"
                 $NuGetSource = "https://nuget.pkg.github.com/mavanmanen/index.json"
-                dotnet new install $PackageId --nuget-source $NuGetSource --force --ignore-failed-sources | Out-Null
+                
+                # CHANGED: Use 'dotnet new update' for cleaner update process
+                dotnet new update --apply --nuget-source $NuGetSource
+                
                 Write-Host "   ✅ Template update check complete." -ForegroundColor Green
 
                 # 5. Cleanup
@@ -260,7 +263,6 @@ switch ($Context) {
         switch ($Command) {
             "install" {
                 Write-Host "📦 Checking template status..." -ForegroundColor Cyan
-                # CHANGED: Removed unsupported --columns flag.
                 $List = dotnet new list | Out-String
                 
                 if ($List -match $ShortName) {
@@ -272,7 +274,8 @@ switch ($Context) {
             }
             "update" {
                 Write-Host "📦 Updating template from NuGet..." -ForegroundColor Cyan
-                dotnet new install $PackageId --nuget-source $NuGetSource --force --ignore-failed-sources
+                # CHANGED: Use 'dotnet new update' instead of install --force
+                dotnet new update --apply --nuget-source $NuGetSource
             }
             "remove" {
                 Write-Host "🗑️ Removing template..." -ForegroundColor Cyan
