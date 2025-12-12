@@ -6,7 +6,8 @@
 #>
 
 param (
-    [Parameter(Mandatory=$true)]
+    # CHANGED: Mandatory=$false so we can prompt interactively if missing
+    [Parameter(Mandatory=$false)]
     [string]$IntegrationName,
 
     [Parameter(Mandatory=$false)]
@@ -19,8 +20,21 @@ $ErrorActionPreference = "Stop"
 . "$PSScriptRoot/Common-Utils.ps1"
 Assert-HamqttWrapper
 
+# --- Interactive Mode ---
+if ([string]::IsNullOrWhiteSpace($IntegrationName)) {
+    Write-Host "📝 New Integration Setup" -ForegroundColor Cyan
+    Write-Host "   Please enter the name for the new integration." -ForegroundColor Yellow
+    Write-Host "   👉 Tip: Use PascalCase (e.g., 'SolarEdge', 'HomeAssistant')." -ForegroundColor Gray
+    
+    $IntegrationName = Read-Host "   > Name"
+
+    if ([string]::IsNullOrWhiteSpace($IntegrationName)) {
+        Write-Error "Integration name is required."
+        exit 1
+    }
+}
+
 # --- Constants ---
-$TemplatePath = Join-Path $ProjectRoot "templates/Hamqtt.Integration.Template"
 $RootComposePath = Join-Path $ProjectRoot "src/docker-compose.dev.yml"
 $SrcPath = Join-Path $ProjectRoot "src"
 
@@ -30,22 +44,7 @@ $ProjectRelPath = Join-Path $SrcPath $ProjectFolderName
 
 Write-Host "🚀 Starting setup for '${ProjectFolderName}'..." -ForegroundColor Cyan
 
-# --- 2. Template Management ---
-Write-Host "`n📦 Checking Template Status..." -ForegroundColor Yellow
-$list = dotnet new list --columns short-name | Out-String
-if ($list -match "hamqtt-integration") {
-    if ($UpdateTemplate) {
-        Write-Host "   Updating template..." -ForegroundColor Gray
-        dotnet new install $TemplatePath --force | Out-Null
-    } else {
-        Write-Host "   ✅ Template already installed." -ForegroundColor Green
-    }
-} else {
-    dotnet new install $TemplatePath | Out-Null
-    Write-Host "   ✅ Template installed." -ForegroundColor Green
-}
-
-# --- 3. Run dotnet new ---
+# --- 2. Run dotnet new ---
 Write-Host "`n🔨 Generating Project..." -ForegroundColor Yellow
 $RootLocation = Get-Location
 
@@ -53,11 +52,12 @@ try {
     if (-not (Test-Path $SrcPath)) { New-Item -ItemType Directory -Path $SrcPath | Out-Null }
     Set-Location $SrcPath
 
+    # Assumes template is already installed via 'hamqtt init' or 'hamqtt template install'
     dotnet new hamqtt-integration `
         --integration-name $IntegrationName `
         --force
 
-    if ($LASTEXITCODE -ne 0) { throw "dotnet new failed" }
+    if ($LASTEXITCODE -ne 0) { throw "dotnet new failed. Ensure template is installed using 'hamqtt template install'" }
 }
 catch {
     Write-Error "Failed to generate project: ${_}"
@@ -69,7 +69,7 @@ finally {
 }
 Write-Host "   ✅ Project generated at: ${ProjectRelPath}" -ForegroundColor Green
 
-# --- 4. Create Project-Level Docker Compose ---
+# --- 3. Create Project-Level Docker Compose ---
 Write-Host "`n🐳 Creating Project Docker Compose..." -ForegroundColor Yellow
 
 $ComposePath = Join-Path $ProjectRelPath "docker-compose.dev.yml"
@@ -79,7 +79,7 @@ New-IntegrationComposeFile -IntegrationName $IntegrationName -OutputPath $Compos
 
 Write-Host "   ✅ Created: ${ComposePath}" -ForegroundColor Green
 
-# --- 5. Update Root Docker Compose (Includes) ---
+# --- 4. Update Root Docker Compose (Includes) ---
 Write-Host "`n🔗 Registering Integration in Root Docker Compose..." -ForegroundColor Yellow
 
 if (Test-Path $RootComposePath) {
@@ -108,7 +108,7 @@ if (Test-Path $RootComposePath) {
         Write-Host "   ℹ️  Reference already exists in root compose file." -ForegroundColor Gray
     }
 } else {
-    Write-Warning "   ⚠️  Root compose file not found at ${RootComposePath}. Run Initialize-Project.ps1 first."
+    Write-Warning "   ⚠️  Root compose file not found at ${RootComposePath}. Run Init-Project.ps1 first."
 }
 
 Write-Host "`n✨ Setup Complete! Run 'docker-compose -f src/docker-compose.dev.yml up -d' to start." -ForegroundColor Cyan
