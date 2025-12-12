@@ -1,4 +1,4 @@
-﻿name: Publish HAMQTT.Integration Nuget
+﻿name: Publish NuGet Packages
 
 on:
   push:
