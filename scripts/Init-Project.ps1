@@ -12,18 +12,23 @@ $ErrorActionPreference = "Stop"
 Assert-HamqttWrapper
 
 # --- Constants ---
+$SrcPath = Join-Path $ProjectRoot "src"
 $EnvFilePath = Join-Path $ProjectRoot "src/.env"
-# CHANGED: ha_config is now located in src/
 $HaConfigPath = Join-Path $ProjectRoot "src/ha_config"
 $RootComposePath = Join-Path $ProjectRoot "src/docker-compose.dev.yml"
 
 Write-Host "🚀 Starting Project Initialization..." -ForegroundColor Cyan
 
+# --- 0. Ensure Source Directory Exists ---
+if (-not (Test-Path $SrcPath)) {
+    New-Item -ItemType Directory -Path $SrcPath -Force | Out-Null
+    Write-Host "   📂 Created source directory: src/" -ForegroundColor Gray
+}
+
 # --- 1. Initialize .env File ---
 Write-Host "`n📝 Configuring Environment Variables..." -ForegroundColor Yellow
 
 if (-not (Test-Path $EnvFilePath)) {
-    # CHANGED: Write all variables at once with explicit newlines to ensure proper formatting
     $DefaultEnvContent = @"
 MQTT_HOST=mosquitto
 MQTT_USERNAME=mqtt
@@ -81,7 +86,7 @@ services:
     container_name: homeassistant
     image: "ghcr.io/home-assistant/home-assistant:stable"
     volumes:
-      # CHANGED: Map config from src/ha_config (sibling directory)
+      # Map config from src/ha_config (sibling directory)
       - ./ha_config:/config
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
@@ -131,6 +136,13 @@ scene: !include scenes.yaml
 } else {
     Write-Host "   ℹ️  Home Assistant config already exists. Skipping." -ForegroundColor Gray
 }
+
+# --- 4. Install Template ---
+Write-Host "`n📦 Verifying Template..." -ForegroundColor Yellow
+
+# Delegate template installation logic to the main wrapper
+$HamqttScript = Join-Path $ProjectRoot "hamqtt.ps1"
+& $HamqttScript template install
 
 Write-Host "`n✨ Initialization Complete!" -ForegroundColor Cyan
 Write-Host "   👉 You can now run 'hamqtt integrations new' to add your first integration." -ForegroundColor Gray

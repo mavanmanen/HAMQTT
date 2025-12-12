@@ -28,6 +28,15 @@ $ScriptsDir = Join-Path $PSScriptRoot "scripts"
 # signals to child scripts that they are running under the wrapper
 $Global:HAMQTT_WRAPPER_ACTIVE = $true
 
+# --- CONSTANTS ---
+# The strict list of core files that constitute the toolchain
+$CoreSafelist = @(
+    "scripts",
+    "hamqtt",
+    "hamqtt.bat",
+    "hamqtt.ps1"
+)
+
 # --- BOOTSTRAP LOGIC ---
 # If no command provided AND the scripts directory is missing, assume we need to pull the repo.
 if ([string]::IsNullOrWhiteSpace($Context) -and -not (Test-Path $ScriptsDir)) {
@@ -52,17 +61,23 @@ if ([string]::IsNullOrWhiteSpace($Context) -and -not (Test-Path $ScriptsDir)) {
             git clone $RepoUrl $TempDir
             if ($LASTEXITCODE -ne 0) { throw "Git clone failed." }
 
-            # 2. Move content to root
-            # CRITICAL: Exclude .git folder to preserve the user's existing repository
-            Write-Host "   📂 Moving files to root..." -ForegroundColor Gray
-            Get-ChildItem -Path $TempDir -Force | 
-                Where-Object { $_.Name -ne ".git" } | 
-                Move-Item -Destination $PSScriptRoot -Force
-
-            # 3. Cleanup
-            Remove-Item -Path $TempDir -Recurse -Force
+            # 2. Copy ONLY Safelisted Items to root
+            Write-Host "   📂 Setting up toolchain..." -ForegroundColor Gray
             
-            # 4. Unix Permissions Fix (if on Linux/Mac)
+            foreach ($ItemName in $CoreSafelist) {
+                $Source = Join-Path $TempDir $ItemName
+                $Destination = Join-Path $PSScriptRoot $ItemName
+
+                if (Test-Path $Source) {
+                    # Recursively copy directory or file
+                    Copy-Item -Path $Source -Destination $Destination -Recurse -Force
+                    Write-Host "      ✅ Initialized: $ItemName" -ForegroundColor Green
+                } else {
+                    Write-Warning "      ⚠️  Missing from source: $ItemName"
+                }
+            }
+
+            # 3. Unix Permissions Fix (if on Linux/Mac)
             if ($IsLinux -or $IsMacOS) {
                 try {
                     $WrapperPath = Join-Path $PSScriptRoot "hamqtt"
@@ -74,7 +89,10 @@ if ([string]::IsNullOrWhiteSpace($Context) -and -not (Test-Path $ScriptsDir)) {
                 }
             }
 
-            Write-Host "   ✅ Repository pulled successfully." -ForegroundColor Green
+            # 4. Cleanup
+            Remove-Item -Path $TempDir -Recurse -Force
+            
+            Write-Host "   ✅ Setup complete." -ForegroundColor Green
             
             # 5. Auto-trigger init
             $Context = "init"
@@ -147,20 +165,6 @@ switch ($Context) {
             $RepoUrl = "https://github.com/mavanmanen/HAMQTT"
             $TempDir = Join-Path $PSScriptRoot "_hamqtt_update_temp"
 
-            # Safelist of files/folders to update (Paths relative to root)
-            # CRITICAL: Do NOT include .git here.
-            $UpdateSafelist = @(
-                ".gitignore",
-                "hamqtt.bat",
-                "hamqtt",       # <--- ADDED: Unix Shell Wrapper
-                "hamqtt.ps1",
-                "scripts",
-                "src/HAMQTT.Integration",
-                "src/Template",
-                "src/HAMQTT.Integration.sln",
-                "src/.gitignore"
-            )
-
             try {
                 if (Test-Path $TempDir) { Remove-Item -Path $TempDir -Recurse -Force -ErrorAction SilentlyContinue }
 
@@ -171,12 +175,12 @@ switch ($Context) {
                 # 2. Copy Safelisted Items
                 Write-Host "   🔄 Updating files..." -ForegroundColor Gray
                 
-                foreach ($ItemPath in $UpdateSafelist) {
+                foreach ($ItemPath in $CoreSafelist) {
                     $Source = Join-Path $TempDir $ItemPath
                     $Destination = Join-Path $PSScriptRoot $ItemPath
 
                     if (Test-Path $Source) {
-                        # Ensure destination directory exists (for new nested folders)
+                        # Ensure destination directory exists
                         $DestParent = Split-Path $Destination -Parent
                         if (-not (Test-Path $DestParent)) {
                             New-Item -ItemType Directory -Path $DestParent -Force | Out-Null
@@ -208,7 +212,7 @@ switch ($Context) {
                     }
                 }
 
-                # 3. Unix Permissions Fix (if on Linux/Mac) after update
+                # 3. Unix Permissions Fix
                 if ($IsLinux -or $IsMacOS) {
                     try {
                         $WrapperPath = Join-Path $PSScriptRoot "hamqtt"
@@ -241,20 +245,21 @@ switch ($Context) {
     }
 
     "template" {
-        $TemplatePath = Join-Path $PSScriptRoot "templates/Hamqtt.Integration.Template"
+        $PackageId = "HAMQTT.Integration.Template"
+        $NuGetSource = "https://nuget.pkg.github.com/mavanmanen/index.json"
+
         switch ($Command) {
             "install" {
-                Write-Host "📦 Installing template..." -ForegroundColor Cyan
-                dotnet new install $TemplatePath
+                Write-Host "📦 Installing template from NuGet..." -ForegroundColor Cyan
+                dotnet new install $PackageId --nuget-source $NuGetSource
             }
             "update" {
-                Write-Host "📦 Updating template..." -ForegroundColor Cyan
-                # Installing over existing one updates it
-                dotnet new install $TemplatePath --force
+                Write-Host "📦 Updating template from NuGet..." -ForegroundColor Cyan
+                dotnet new install $PackageId --nuget-source $NuGetSource --force
             }
             "remove" {
                 Write-Host "🗑️ Removing template..." -ForegroundColor Cyan
-                dotnet new uninstall $TemplatePath
+                dotnet new uninstall $PackageId
             }
             Default {
                 Write-Warning "Unknown command '$Command'. Use install, update, or remove."
