@@ -73,20 +73,18 @@ function Get-IntegrationServiceBlock {
     
     # Returns the YAML string for the service definition
     # Indented by 2 spaces to match 'services:' children
+    
     return @"
   hamqtt-integration-${KebabName}:
+    name: hamqtt-integration-${KebabName}
     build:
       context: .
       args:
-        - GITHUB_USERNAME=${GITHUB_USERNAME}
-        - GITHUB_PAT=${GITHUB_PAT}
+        - GITHUB_USERNAME=`${GITHUB_USERNAME}
+        - GITHUB_PAT=`${GITHUB_PAT}
     env_file:
       - .env
       - ../.env
-    environment:
-      - MQTT_HOST
-      - MQTT_USERNAME
-      - MQTT_PASSWORD
     restart: unless-stopped
     networks:
       - hamqtt-integration_network

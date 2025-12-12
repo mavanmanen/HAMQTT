@@ -124,7 +124,7 @@ Write-Host "   ✅ Environment variables saved to: $EnvFilePath" -ForegroundColo
 Write-Host "`n🏗️  Configuring Infrastructure..." -ForegroundColor Yellow
 
 if (-not (Test-Path $RootComposePath)) {
-    $RootComposeContent = @"
+    $RootComposeContent = @'
 # Location: src/docker-compose.dev.yml
 # This file manages the shared infrastructure (Mosquitto, Home Assistant) and includes integrations.
 
@@ -143,9 +143,6 @@ services:
     # Load .env from same directory (src/)
     env_file:
       - .env
-    environment:
-      - MQTT_USERNAME
-      - MQTT_PASSWORD
     # Dynamically create config and password file on startup
     command: >
       sh -c "echo 'per_listener_settings true' > /mosquitto/config/mosquitto.conf &&
@@ -153,13 +150,11 @@ services:
              echo 'allow_anonymous false' >> /mosquitto/config/mosquitto.conf &&
              echo 'password_file /mosquitto/config/passwd' >> /mosquitto/config/mosquitto.conf &&
              touch /mosquitto/config/passwd &&
-             mosquitto_passwd -b /mosquitto/config/passwd \$\${MQTT_USERNAME} \$\${MQTT_PASSWORD} &&
+             chmod 0700 /mosquitto/config/passwd &&
+             mosquitto_passwd -b /mosquitto/config/passwd ${MQTT_USERNAME} ${MQTT_PASSWORD} &&
              /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf"
     networks:
       - hamqtt-integration_network
-    volumes:
-      - mosquitto_data:/mosquitto/data
-      - mosquitto_log:/mosquitto/log
 
   # Home Assistant (Local Dev)
   homeassistant:
@@ -181,11 +176,7 @@ networks:
   hamqtt-integration_network:
     name: hamqtt-integration_network
     driver: bridge
-
-volumes:
-  mosquitto_data:
-  mosquitto_log:
-"@
+'@
     $RootComposeContent | Set-Content -Path $RootComposePath
     Write-Host "   ✅ Created root infrastructure compose file: $RootComposePath" -ForegroundColor Green
 } else {
@@ -199,8 +190,19 @@ if (-not (Test-Path $HaConfigPath)) {
     
     $HaYaml = @"
 default_config:
-tts:
-  - platform: google_translate
+
+homeassistant:
+  auth_providers:
+    - type: homeassistant # Keep the default Home Assistant authentication provider
+    - type: trusted_networks
+      trusted_networks:
+        - 192.168.1.0/24 # Example: Allow all devices on the 192.168.1.x subnet
+        - 172.17.0.0/16  # Docker default bridge network
+        - 172.18.0.0/16  # Additional Docker networks if needed
+        - 127.0.0.1      # Always include localhost
+        - ::1            # Include IPv6 localhost if applicable
+      allow_bypass_login: true
+
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
