@@ -1,6 +1,6 @@
-# HAMQTT
+# HAMQTT.Net
 
-**HAMQTT** is a streamlined development framework designed to rapidly scaffold, build, and deploy **.NET-based MQTT integrations** for Home Assistant.
+**HAMQTT.Net** is a streamlined development framework designed to rapidly scaffold, build, and deploy **.NET-based MQTT integrations** for Home Assistant.
 
 It abstracts away the complexity of managing Docker infrastructure, MQTT connectivity, and project scaffolding, allowing you to focus on the logic of your IoT integrations.
 

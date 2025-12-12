@@ -6,7 +6,7 @@
 param (
     # Defaults to the repository root
     [string]$OutputDirectory,
-    [string]$ImageBaseUrl = "ghcr.io/mavanmanen/hamqtt"
+    [string]$ImageBaseUrl = "ghcr.io/mavanmanen/hamqtt.net"
 )
 
 $ErrorActionPreference = "Stop"
@@ -73,6 +73,7 @@ foreach ($dir in $Integrations) {
 
     $ServicesYaml += @"
   hamqtt-integration-${KebabName}:
+    container_name: hamqtt-integration-${KebabName}
     image: ${ImageUrl}
     restart: unless-stopped
     network_mode: bridge

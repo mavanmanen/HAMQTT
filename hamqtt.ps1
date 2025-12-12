@@ -54,7 +54,7 @@ if ([string]::IsNullOrWhiteSpace($Context) -and -not (Test-Path $ScriptsDir)) {
         }
 
         Write-Host "`n📦 Cloning repository..." -ForegroundColor Cyan
-        $RepoUrl = "https://github.com/mavanmanen/HAMQTT"
+        $RepoUrl = "https://github.com/mavanmanen/HAMQTT.Net"
         $TempDir = Join-Path $PSScriptRoot "_hamqtt_temp_clone"
 
         try {
@@ -208,7 +208,7 @@ switch ($Context) {
         if ($Response.Trim().ToLower() -eq 'y') {
             Write-Host "`n📦 Downloading latest version..." -ForegroundColor Cyan
             
-            $RepoUrl = "https://github.com/mavanmanen/HAMQTT"
+            $RepoUrl = "https://github.com/mavanmanen/HAMQTT.Net"
             $TempDir = Join-Path $PSScriptRoot "_hamqtt_update_temp"
 
             try {
