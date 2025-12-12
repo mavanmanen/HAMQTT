@@ -5,6 +5,7 @@
 .EXAMPLE
     .\hamqtt.ps1
     .\hamqtt.ps1 init
+    .\hamqtt.ps1 run dev
     .\hamqtt.ps1 update
     .\hamqtt.ps1 clean
     .\hamqtt.ps1 template install
@@ -122,6 +123,7 @@ function Show-Usage {
     Write-Host "Usage:" -ForegroundColor Yellow
     Write-Host "  hamqtt                                (Run in empty folder to clone repo)" -ForegroundColor Gray
     Write-Host "  hamqtt init                           (Initialize fresh project & install template)" -ForegroundColor Gray
+    Write-Host "  hamqtt run dev                        (Start local development environment)" -ForegroundColor Gray
     Write-Host "  hamqtt update                         (Update core scripts/libs from master)" -ForegroundColor Gray
     Write-Host "  hamqtt clean                          (Remove temp files & production artifacts)" -ForegroundColor Gray
     Write-Host "  hamqtt template [install|update|remove] (Manage dotnet templates)" -ForegroundColor Gray
@@ -145,6 +147,40 @@ switch ($Context) {
     "init" {
         Write-Host "▶ Running Initialization..." -ForegroundColor Cyan
         & "$ScriptsDir/Init-Project.ps1"
+    }
+
+    "run" {
+        switch ($Command) {
+            "dev" {
+                $ComposeFile = Join-Path $PSScriptRoot "src/docker-compose.dev.yml"
+                
+                if (-not (Test-Path $ComposeFile)) {
+                    Write-Error "Dev compose file not found at $ComposeFile. Please run 'hamqtt init' first."
+                }
+
+                Write-Host "🚀 Starting Local Development Environment..." -ForegroundColor Cyan
+                
+                # Check for docker-compose
+                if (-not (Get-Command "docker-compose" -ErrorAction SilentlyContinue)) {
+                    Write-Error "❌ docker-compose is not installed or not in PATH."
+                }
+
+                try {
+                    # Run docker-compose up detached
+                    docker-compose -f $ComposeFile up -d --remove-orphans
+                    if ($LASTEXITCODE -eq 0) {
+                        Write-Host "   ✅ Development environment started." -ForegroundColor Green
+                    } else {
+                         throw "Docker compose returned exit code $LASTEXITCODE"
+                    }
+                } catch {
+                    Write-Error "   ❌ Failed to start environment: $_"
+                }
+            }
+            Default {
+                Write-Warning "Unknown command '$Command'. Use 'dev'."
+            }
+        }
     }
 
     "clean" {
@@ -230,7 +266,7 @@ switch ($Context) {
                 $PackageId = "HAMQTT.Integration.Template"
                 $NuGetSource = "https://nuget.pkg.github.com/mavanmanen/index.json"
                 
-                dotnet new update --apply --nuget-source $NuGetSource
+                dotnet new update --nuget-source $NuGetSource
                 
                 Write-Host "   ✅ Template update check complete." -ForegroundColor Green
 
@@ -267,7 +303,7 @@ switch ($Context) {
                      Write-Host "   ✅ Template '$PackageId' is already installed." -ForegroundColor Green
                 } else {
                      Write-Host "   Installing template from NuGet..." -ForegroundColor Cyan
-                     dotnet new install $PackageId --nuget-source $NuGetSource --ignore-failed-sources
+                     dotnet new install $PackageId --nuget-source $NuGetSource
                 }
             }
             "update" {
