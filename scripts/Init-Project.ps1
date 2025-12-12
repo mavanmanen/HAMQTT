@@ -137,9 +137,7 @@ services:
     image: eclipse-mosquitto:2
     container_name: mqtt_broker
     restart: unless-stopped
-    ports:
       - "1883:1883"
-      - "9001:9001"
     # Load .env from same directory (src/)
     env_file:
       - .env

@@ -5,7 +5,7 @@
 .EXAMPLE
     .\hamqtt.ps1
     .\hamqtt.ps1 init
-    .\hamqtt.ps1 run dev
+    .\hamqtt.ps1 run dev --bare
     .\hamqtt.ps1 update
     .\hamqtt.ps1 clean
     .\hamqtt.ps1 template install
@@ -123,7 +123,7 @@ function Show-Usage {
     Write-Host "Usage:" -ForegroundColor Yellow
     Write-Host "  hamqtt                                (Run in empty folder to clone repo)" -ForegroundColor Gray
     Write-Host "  hamqtt init                           (Initialize fresh project & install template)" -ForegroundColor Gray
-    Write-Host "  hamqtt run dev                        (Start local development environment)" -ForegroundColor Gray
+    Write-Host "  hamqtt run dev [--bare]               (Start local dev env. Use --bare for infra only)" -ForegroundColor Gray
     Write-Host "  hamqtt update                         (Update core scripts/libs from master)" -ForegroundColor Gray
     Write-Host "  hamqtt clean                          (Remove temp files & production artifacts)" -ForegroundColor Gray
     Write-Host "  hamqtt template [install|update|remove] (Manage dotnet templates)" -ForegroundColor Gray
@@ -158,6 +158,9 @@ switch ($Context) {
                     Write-Error "Dev compose file not found at $ComposeFile. Please run 'hamqtt init' first."
                 }
 
+                # Check for --bare flag
+                $BareMode = $ExtraArgs -contains "--bare"
+
                 Write-Host "🚀 Starting Local Development Environment..." -ForegroundColor Cyan
                 
                 # Check for docker-compose
@@ -166,8 +169,15 @@ switch ($Context) {
                 }
 
                 try {
-                    # Run docker-compose up detached
+                    if ($BareMode) {
+                        Write-Host "   ℹ️  Running in BARE mode (Mosquitto & HomeAssistant only)." -ForegroundColor Yellow
+                        # Explicitly target infrastructure services
+                        docker-compose -f $ComposeFile up -d --remove-orphans mosquitto homeassistant
+                    } else {
+                        # Default: Run everything defined in the compose file (including includes)
                     docker-compose -f $ComposeFile up -d --remove-orphans
+                    }
+
                     if ($LASTEXITCODE -eq 0) {
                         Write-Host "   ✅ Development environment started." -ForegroundColor Green
                     } else {
@@ -300,13 +310,11 @@ switch ($Context) {
                      Write-Host "   ✅ Template '$PackageId' is already installed." -ForegroundColor Green
                 } else {
                      Write-Host "   Installing template from NuGet..." -ForegroundColor Cyan
-                     # CHANGED: Removed --nuget-source
-                     dotnet new install $PackageId --ignore-failed-sources
+                     dotnet new install $PackageId
                 }
             }
             "update" {
                 Write-Host "📦 Updating templates..." -ForegroundColor Cyan
-                # CHANGED: Removed --nuget-source. 'dotnet new update' checks all configured sources.
                 dotnet new update
             }
             "remove" {

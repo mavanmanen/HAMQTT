@@ -76,7 +76,7 @@ function Get-IntegrationServiceBlock {
     
     return @"
   hamqtt-integration-${KebabName}:
-    name: hamqtt-integration-${KebabName}
+    container_name: hamqtt-integration-${KebabName}
     build:
       context: .
       args:
