@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="HAMQTT.Integration" Version="1.0.1" />
+      <PackageReference Include="HAMQTT.Integration" Version="1.0.*" />
     </ItemGroup>
 
 </Project>

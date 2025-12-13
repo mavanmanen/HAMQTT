@@ -9,7 +9,6 @@ $ErrorActionPreference = "Stop"
 
 # --- Import Shared Functions & Assert Wrapper ---
 . "$PSScriptRoot/Common-Utils.ps1"
-Assert-HamqttWrapper
 
 # --- Constants ---
 $SrcPath = Join-Path $ProjectRoot "src"
@@ -220,10 +219,7 @@ scene: !include scenes.yaml
 
 # --- 5. Install Template ---
 Write-Host "`n📦 Verifying Template..." -ForegroundColor Yellow
-
-# Delegate template installation logic to the main wrapper
-$HamqttScript = Join-Path $ProjectRoot "hamqtt.ps1"
-& $HamqttScript template install
+hamqtt template install
 
 Write-Host "`n✨ Initialization Complete!" -ForegroundColor Cyan
 Write-Host "   👉 You can now run 'hamqtt integrations new' to add your first integration." -ForegroundColor Gray

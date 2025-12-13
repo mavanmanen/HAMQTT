@@ -9,7 +9,6 @@ $ErrorActionPreference = "Stop"
 
 # --- Import Shared Functions & Assert Wrapper ---
 . "$PSScriptRoot/Common-Utils.ps1"
-Assert-HamqttWrapper
 
 # --- Constants ---
 $SrcPath = Join-Path $ProjectRoot "src"

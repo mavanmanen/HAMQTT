@@ -8,18 +8,6 @@ $Global:ProjectRoot = Get-Location
 
 # --- Shared Functions ---
 
-function Assert-HamqttWrapper {
-    <#
-    .SYNOPSIS
-        Ensures the script is running under the context of the main hamqtt wrapper.
-    #>
-    if (-not $Global:HAMQTT_WRAPPER_ACTIVE) {
-        Write-Warning "⛔ Direct execution is not allowed."
-        Write-Host "   Please use the 'hamqtt' wrapper command." -ForegroundColor Gray
-        exit 1
-    }
-}
-
 function Get-KebabCase {
     param ([string]$InputString)
     

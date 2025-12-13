@@ -18,7 +18,6 @@ $ErrorActionPreference = "Stop"
 
 # --- Import Shared Functions & Assert Wrapper ---
 . "$PSScriptRoot/Common-Utils.ps1"
-Assert-HamqttWrapper
 
 # --- Interactive Mode ---
 if ([string]::IsNullOrWhiteSpace($IntegrationName)) {

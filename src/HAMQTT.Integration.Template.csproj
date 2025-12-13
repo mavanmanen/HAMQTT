@@ -17,6 +17,10 @@
         <RepositoryType>git</RepositoryType>
         <NoDefaultExcludes>true</NoDefaultExcludes>
     </PropertyGroup>
+
+    <PropertyGroup>
+        <NoWarn>$(NoWarn);NU5128</NoWarn>
+    </PropertyGroup>
     
     <ItemGroup>
         <Content Include="Template\**\*" Exclude="Template\**\bin\**;Template\**\obj\**"/>

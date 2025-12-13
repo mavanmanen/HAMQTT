@@ -15,7 +15,6 @@ $ErrorActionPreference = "Stop"
 
 # --- Import Shared Functions & Assert Wrapper ---
 . "$PSScriptRoot/Common-Utils.ps1"
-Assert-HamqttWrapper
 
 # --- Constants ---
 $RootComposePath = Join-Path $ProjectRoot "src/docker-compose.dev.yml"
