@@ -5,11 +5,10 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>hamqtt</ToolCommandName>
         <PackageId>HAMQTT.CLI</PackageId>
-        <Version>1.0.4</Version>
+        <Version>1.0.11</Version>
         <Authors>mavanmanen</Authors>
         <Description>CLI tool for scaffolding and managing HAMQTT integrations.</Description>
     </PropertyGroup>
