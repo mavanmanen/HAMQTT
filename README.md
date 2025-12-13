@@ -59,7 +59,7 @@ Once installed, the `hamqtt` command is available globally.
 ### Managing Integrations
 
 **Create a new integration:**
-Scaffolds a new .NET project in `src/` and registers it in the development `docker-compose` file.
+Scaffolds a new .NET project and registers it in the development `docker-compose` file.
 
 ```bash
 hamqtt integrations new MyDeviceName
@@ -100,10 +100,10 @@ hamqtt run dev --bare
 ### Deployment
 
 **Build for Production:**
-Generates a production-ready `docker-compose.yml` and `.env` file in the root directory (or specified output).
+Generates a production-ready `docker-compose.yml` file in the root directory (or specified output).
 
 ```bash
-hamqtt deploy
+hamqtt integrations deploy
 ```
 
 ### Maintenance
@@ -122,42 +122,31 @@ To update the underlying project templates:
 hamqtt template update
 ```
 
-**Clean Artifacts:**
-Removes generated Docker files, build artifacts (`bin`/`obj`), and temporary folders.
-
-```bash
-hamqtt clean
-```
-
 -----
 
 ## 📂 Project Structure
 
 ```text
 /
-├── hamqtt.ps1             # (Internal) CLI entry logic embedded in tool
-├── docker-compose.yml     # (Generated) Production deployment file
-└── src/
-    ├── .env               # Secrets (GitIgnored)
-    ├── docker-compose.dev.yml # Local development infrastructure
-    ├── ha_config/         # Local Home Assistant configuration
-    ├── HAMQTT.Integration # Base library
-    ├── HAMQTT.Integration.Template # NuGet Template source
-    └── HAMQTT.Integration.MyDevice # (Your custom integrations...)
+├── docker-compose.yml          # (Generated) Production deployment file
+├── .env                        # Secrets (GitIgnored)
+├── docker-compose.dev.yml      # Local development infrastructure
+├── ha_config/                  # Local Home Assistant configuration
+└── HAMQTT.Integration.MyDevice # (Your custom integrations...)
 ```
 
 -----
 
 ## 🔒 Configuration & Secrets
 
-Configuration is managed via the **`src/.env`** file.
+Configuration is managed via the **`.env`** file.
 
   * **MQTT\_HOST**: Hostname of the broker (default: `mosquitto` for Docker, `localhost` for IDE).
   * **MQTT\_USERNAME**: Broker username.
   * **MQTT\_PASSWORD**: Broker password.
   * **GITHUB\_USERNAME / GITHUB\_PAT**: Credentials for restoring NuGet packages.
 
-> ⚠️ **Security Warning:** The `src/.env` file contains sensitive credentials. It is added to `.gitignore` by default. Do not commit this file to version control.
+> ⚠️ **Security Warning:** The `.env` file contains sensitive credentials. It should be added to `.gitignore`. Do not commit this file to version control.
 
 -----
 
