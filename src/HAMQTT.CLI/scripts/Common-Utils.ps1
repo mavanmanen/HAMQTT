@@ -4,8 +4,7 @@
 #>
 
 # --- Global Path Definitions ---
-# Calculate the repo root relative to THIS file (which is inside /scripts)
-$Global:ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$Global:ProjectRoot = Get-Location
 
 # --- Shared Functions ---
 

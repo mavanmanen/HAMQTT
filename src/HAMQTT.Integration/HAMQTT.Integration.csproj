@@ -15,7 +15,6 @@
     <ItemGroup>
         <PackageReference Include="Coravel" Version="6.0.2"/>
         <PackageReference Include="HomeAssistantDiscoveryNet" Version="6.0.1"/>
-        <PackageReference Include="RestSharp" Version="113.0.0"/>
         <PackageReference Include="ToMqttNet" Version="6.0.1"/>
     </ItemGroup>
 

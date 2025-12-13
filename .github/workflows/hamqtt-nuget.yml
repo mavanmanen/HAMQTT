@@ -67,6 +67,14 @@ jobs:
       project_path: src/HAMQTT.Integration.Template.csproj
       version: ${{ needs.prepare-version.outputs.version }}
       artifact_name: hamqtt-integration-template
+      
+  build-cli:
+    needs: prepare-version
+    uses: ./.github/workflows/hamqtt-build-pack.yml
+    with:
+      project_path: src/HAMQTT.CLI/HAMQTT.CLI.csproj
+      version: ${{ needs.prepare-version.outputs.version }}
+      artifact_name: hamqtt-cli
 
   publish-packages:
     needs: [build-library, build-template]
@@ -89,6 +97,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: hamqtt-integration-template
+          path: packages
+          
+      - name: Download CLI Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: hamqtt-cli
           path: packages
 
       - name: Push to GitHub Packages

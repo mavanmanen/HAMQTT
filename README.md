@@ -6,55 +6,46 @@ It abstracts away the complexity of managing Docker infrastructure, MQTT connect
 
 ## 🚀 Features
 
-  * **⚡ Rapid Scaffolding:** Generate new .NET integration projects in seconds using custom templates.
-  * **🐳 Docker-First Workflow:** Automatically manages `docker-compose` configurations for development and production.
-  * **🛠️ CLI Tooling:** Includes a powerful cross-platform CLI (`hamqtt`) to manage the entire lifecycle.
-  * **🏠 Local Dev Environment:** One-command setup for a local Home Assistant and Mosquitto instance.
-  * **🔄 Auto-Discovery Ready:** Built on top of `HAMQTT.Integration` to easily interface with Home Assistant's MQTT discovery protocol.
+* **⚡ Rapid Scaffolding:** Generate new .NET integration projects in seconds using custom templates.
+* **🐳 Docker-First Workflow:** Automatically manages `docker-compose` configurations for development and production.
+* **🛠️ CLI Tooling:** Includes a powerful cross-platform CLI (`hamqtt`) installed globally to manage the entire lifecycle.
+* **🏠 Local Dev Environment:** One-command setup for a local Home Assistant and Mosquitto instance.
+* **🔄 Auto-Discovery Ready:** Built on top of `HAMQTT.Integration` to easily interface with Home Assistant's MQTT discovery protocol.
 
------
+---
 
 ## 📋 Prerequisites
 
-Before using HAMQTT, ensure you have the following installed:
+Before using HAMQTT.Net, ensure you have the following installed:
 
-1.  **Docker Desktop** (or Docker Engine + Docker Compose)
-2.  **PowerShell Core (pwsh)** (Required for cross-platform scripts on Linux/macOS; standard on Windows)
-3.  **.NET SDK 10.0** (or compatible version)
-4.  **Git**
+1.  **.NET SDK 10.0** (or compatible version) - [Download](https://dotnet.microsoft.com/download)
+2.  **Docker Desktop** (or Docker Engine + Docker Compose)
+3.  **Git**
+4.  *(Optional)* **PowerShell Core (pwsh)** - The underlying scripts run on PowerShell, but the CLI wrapper handles execution.
 
------
+---
 
 ## 🛠️ Installation & Setup
 
-### 1\. Bootstrap the Repository
+HAMQTTN.et is distributed as a **.NET Global Tool**.
 
-If you are starting in an empty directory, you can bootstrap the toolchain automatically.
-
-**Windows:**
-
-```powershell
-.\hamqtt.ps1
-```
-
-**Linux / macOS:**
+### 1. Install the CLI Tool
+Open your terminal and run the following command to install the `hamqtt` tool globally on your system:
 
 ```bash
-./hamqtt
-```
+dotnet tool install -g HAMQTT.CLI
+````
 
-*Select **Yes** when prompted to clone the repository.*
+*Note: You may need to add the .NET tools directory to your PATH if you haven't done so already.*
 
-### 2\. Initialize the Project
+### 2\. Initialize a Project
 
-Once the tools are present, initialize the workspace. This sets up your `.env` secrets, creates the solution file, and installs the necessary project templates.
+Create a new directory for your project and initialize the workspace. This sets up your solution file, secrets, and installs the necessary templates.
 
 ```bash
-# Windows
-.\hamqtt init
-
-# Linux / macOS
-./hamqtt init
+mkdir MyHomeAutomation
+cd MyHomeAutomation
+hamqtt init
 ```
 
 > **Note on Credentials:** During initialization, you will be asked for your GitHub Username and a **Personal Access Token (PAT)**. This is required to restore the project templates and base libraries from the GitHub Package Registry.
@@ -63,7 +54,7 @@ Once the tools are present, initialize the workspace. This sets up your `.env` s
 
 ## 💻 Usage Guide
 
-The `hamqtt` wrapper is your primary interface for the project.
+Once installed, the `hamqtt` command is available globally.
 
 ### Managing Integrations
 
@@ -71,7 +62,7 @@ The `hamqtt` wrapper is your primary interface for the project.
 Scaffolds a new .NET project in `src/` and registers it in the development `docker-compose` file.
 
 ```bash
-./hamqtt integrations new MyDeviceName
+hamqtt integrations new MyDeviceName
 ```
 
 *(Tip: Use PascalCase for names, e.g., `SolarEdge`, `SmartMeter`)*
@@ -80,14 +71,14 @@ Scaffolds a new .NET project in `src/` and registers it in the development `dock
 View the status of all local integrations.
 
 ```bash
-./hamqtt integrations list
+hamqtt integrations list
 ```
 
 **Remove an integration:**
 Deletes the project folder and removes it from the configuration.
 
 ```bash
-./hamqtt integrations remove
+hamqtt integrations remove
 ```
 
 ### Running the Environment
@@ -96,14 +87,14 @@ Deletes the project folder and removes it from the configuration.
 Starts Mosquitto, Home Assistant, and **all** your created integrations in Docker containers.
 
 ```bash
-./hamqtt run dev
+hamqtt run dev
 ```
 
 **Start Infrastructure Only (Bare Mode):**
 Starts only Mosquitto and Home Assistant. Use this if you want to run/debug your .NET integration from your IDE (Visual Studio / Rider) while keeping the infrastructure containerized.
 
 ```bash
-./hamqtt run dev --bare
+hamqtt run dev --bare
 ```
 
 ### Deployment
@@ -112,23 +103,30 @@ Starts only Mosquitto and Home Assistant. Use this if you want to run/debug your
 Generates a production-ready `docker-compose.yml` and `.env` file in the root directory (or specified output).
 
 ```bash
-./hamqtt deploy
+hamqtt deploy
 ```
 
 ### Maintenance
 
 **Update Tooling:**
-Updates the core `hamqtt` scripts and templates from the master repository without touching your custom code.
+To update the HAMQTT CLI to the latest version:
 
 ```bash
-./hamqtt update
+dotnet tool update -g HAMQTT.CLI
+```
+
+**Update Templates:**
+To update the underlying project templates:
+
+```bash
+hamqtt template update
 ```
 
 **Clean Artifacts:**
 Removes generated Docker files, build artifacts (`bin`/`obj`), and temporary folders.
 
 ```bash
-./hamqtt clean
+hamqtt clean
 ```
 
 -----
@@ -137,10 +135,8 @@ Removes generated Docker files, build artifacts (`bin`/`obj`), and temporary fol
 
 ```text
 /
-├── hamqtt                 # Unix entry point
-├── hamqtt.ps1             # Main CLI logic
+├── hamqtt.ps1             # (Internal) CLI entry logic embedded in tool
 ├── docker-compose.yml     # (Generated) Production deployment file
-├── scripts/               # Core PowerShell scripts
 └── src/
     ├── .env               # Secrets (GitIgnored)
     ├── docker-compose.dev.yml # Local development infrastructure
@@ -173,4 +169,8 @@ Configuration is managed via the **`src/.env`** file.
 
 ## 📄 License
 
-[MIT License](https://www.google.com/search?q=LICENSE)
+[GNU Affero General Public License v3.0](LICENSE)
+
+## 🔗 Repository
+
+[https://github.com/mavanmanen/HAMQTT.Net](https://www.google.com/search?q=https://github.com/mavanmanen/HAMQTT.Net)
