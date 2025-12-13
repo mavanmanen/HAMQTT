@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <PackageType>Template</PackageType>
-        <PackageVersion>1.0.1</PackageVersion>
-        <Version>1.0.1</Version>
+        <Version>1.0.11</Version>
         <PackageId>HAMQTT.Integration.Template</PackageId>
         <Title>HAMQTT Integration Template</Title>
         <Authors>mavanmanen</Authors>
