@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <PackageType>Template</PackageType>
-        <Version>1.0.11</Version>
+        <Version>1.0.12</Version>
         <PackageId>HAMQTT.Integration.Template</PackageId>
         <Title>HAMQTT Integration Template</Title>
         <Authors>mavanmanen</Authors>
@@ -22,26 +22,8 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <Content Include="Template\**\*" Exclude="Template\**\bin\**;Template\**\obj\**"/>
+        <None Remove="**\*" />
         <Compile Remove="**\*" />
-        <None Remove="HAMQTT.Integration\**;HAMQTT.CLI\**;.gitignore;Template\**\bin\**;Template\**\obj\**" />
-        <Content Update="Template\HAMQTT.Integration.IntegrationName\IntegrationName\workflows\integration-name.yml">
-          <Link>Template\HAMQTT.Integration.IntegrationName\HAMQTT.Integration.IntegrationName\workflows\integration-name.yml</Link>
-        </Content>
-        <Content Update="Template\HAMQTT.Integration.IntegrationName\IntegrationName\.env">
-          <Link>Template\HAMQTT.Integration.IntegrationName\HAMQTT.Integration.IntegrationName\.env</Link>
-        </Content>
-        <Content Update="Template\HAMQTT.Integration.IntegrationName\IntegrationName\Dockerfile">
-          <Link>Template\HAMQTT.Integration.IntegrationName\HAMQTT.Integration.IntegrationName\Dockerfile</Link>
-        </Content>
-        <Content Update="Template\HAMQTT.Integration.IntegrationName\IntegrationName\IntegrationNameIntegration.cs">
-          <Link>Template\HAMQTT.Integration.IntegrationName\HAMQTT.Integration.IntegrationName\IntegrationNameIntegration.cs</Link>
-        </Content>
-        <Content Update="Template\HAMQTT.Integration.IntegrationName\IntegrationName\Program.cs">
-          <Link>Template\HAMQTT.Integration.IntegrationName\HAMQTT.Integration.IntegrationName\Program.cs</Link>
-        </Content>
-        <Content Update="Template\HAMQTT.Integration.IntegrationName\IntegrationName\Startup.cs">
-          <Link>Template\HAMQTT.Integration.IntegrationName\HAMQTT.Integration.IntegrationName\Startup.cs</Link>
-        </Content>
+        <Content Include="Template\**\*" Exclude="Template\**\bin\**;Template\**\obj\**"/>
     </ItemGroup>
 </Project>
