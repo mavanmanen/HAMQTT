@@ -11,7 +11,9 @@ param (
     [string]$IntegrationName,
 
     [Parameter(Mandatory = $false)]
-    [switch]$UpdateTemplate
+    [switch]$UpdateTemplate,
+
+    [string]$ProjectRoot
 )
 
 $ErrorActionPreference = "Stop"

@@ -5,6 +5,10 @@
     Generates the root infrastructure Docker Compose file.
 #>
 
+param(
+    [string]$ProjectRoot
+)
+
 $ErrorActionPreference = "Stop"
 
 # --- Import Shared Functions & Assert Wrapper ---
