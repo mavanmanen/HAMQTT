@@ -178,6 +178,25 @@ function Update-IntegrationServiceInCompose
     }
 }
 
-function Get-Integrations() {
-    return Get-ChildItem -Exclude .github,ha_config | Get-ChildItem -Path $ProjectRoot -Directory
+function Get-Integrations {
+    $CandidateDirs = Get-ChildItem -Path $ProjectRoot -Directory
+    $ValidIntegrations = @()
+
+    foreach ($dir in $CandidateDirs)
+    {
+        # Search for .csproj files within the directory (limited depth to avoid deep scans)
+        $Csproj = Get-ChildItem -Path $dir.FullName -Filter "*.csproj" -Recurse -Depth 2 -ErrorAction SilentlyContinue | Select-Object -First 1
+        
+        if ($Csproj)
+        {
+            $Content = Get-Content $Csproj.FullName -Raw
+            # Check for PackageReference or ProjectReference to HAMQTT.Integration
+            if ($Content -match 'Include="HAMQTT\.Integration"')
+            {
+                $ValidIntegrations += $dir
+            }
+        }
+    }
+    
+    return $ValidIntegrations
 }

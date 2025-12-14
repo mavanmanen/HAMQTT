@@ -37,8 +37,8 @@ foreach ($dir in $IntegrationDirs)
 {
     $ComposePath = Join-Path $dir.FullName "docker-compose.dev.yml"
 
-    # Use shared function to get clean name
-    $CleanName = Get-CleanIntegrationName $dir.Name
+    # Use dir name directly
+    $CleanName = $dir.Name
 
     if (-not (Test-Path $ComposePath))
     {
