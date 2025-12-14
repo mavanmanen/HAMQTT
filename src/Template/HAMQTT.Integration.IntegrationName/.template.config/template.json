@@ -26,14 +26,14 @@
         "**/*.filelist",
         "**/*.user",
         "**/*.lock.json",
-        "integration-name.yml"
+        "HAMQTT.Integration.IntegrationName/workflows/**"
       ]
     },
     {
       "source": "./HAMQTT.Integration.IntegrationName/workflows/",
-      "target": "../.github/workflows/",
+      "target": ".github/workflows/",
       "include": [
-        "integration-name.yml"
+        "*.yml"
       ]
     }
   ],
