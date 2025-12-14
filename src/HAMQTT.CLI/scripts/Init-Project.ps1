@@ -11,20 +11,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# --- Import Shared Functions & Assert Wrapper ---
 . "$PSScriptRoot/Common-Utils.ps1"
 
-# --- Constants ---
 $EnvFilePath = Join-Path $ProjectRoot ".env"
 $HaConfigPath = Join-Path $ProjectRoot "ha_config"
 $RootComposePath = Join-Path $ProjectRoot "docker-compose.dev.yml"
 
 Write-Host "🚀 Starting Project Initialization..." -ForegroundColor Cyan
 
-# --- 1. Create .NET Solution File ---
 Write-Host "`n📄 Configuring Solution..." -ForegroundColor Yellow
 
-# Check if a .sln already exists
 $ExistingSln = Get-ChildItem -Path $ProjectRoot -Filter "*.sln" | Select-Object -First 1
 
 if ($ExistingSln)
@@ -33,7 +29,6 @@ if ($ExistingSln)
 }
 else
 {
-    # Default name = Current Directory Name
     $DefaultName = Split-Path $ProjectRoot -Leaf
 
     Write-Host "   Enter a name for the solution file (Default: $DefaultName)" -ForegroundColor Cyan
@@ -59,10 +54,8 @@ else
     }
 }
 
-# --- 2. Configure Credentials & .env ---
 Write-Host "`n🔑 Configuring Credentials..." -ForegroundColor Yellow
 
-# 2a. Load existing .env if present
 $EnvContent = @{ }
 if (Test-Path $EnvFilePath)
 {
@@ -74,7 +67,6 @@ if (Test-Path $EnvFilePath)
     }
 }
 
-# 2b. Default Values
 if (-not $EnvContent.ContainsKey("MQTT_HOST"))
 {
     $EnvContent["MQTT_HOST"] = "mosquitto"
@@ -88,7 +80,6 @@ if (-not $EnvContent.ContainsKey("MQTT_PASSWORD"))
     $EnvContent["MQTT_PASSWORD"] = "password"
 }
 
-# 2c. Prompt for GitHub Credentials (Required for NuGet & Docker Build)
 if (-not $EnvContent.ContainsKey("GITHUB_USERNAME") -or [string]::IsNullOrWhiteSpace($EnvContent["GITHUB_USERNAME"]))
 {
     Write-Host "   👤 GitHub Username is required for package access." -ForegroundColor Cyan
@@ -110,7 +101,6 @@ if (-not $EnvContent.ContainsKey("GITHUB_PAT") -or [string]::IsNullOrWhiteSpace(
     }
 }
 
-# 2d. Configure Local NuGet Source
 if ($EnvContent["GITHUB_USERNAME"] -and $EnvContent["GITHUB_PAT"])
 {
     $SourceName = "github-mavanmanen"
@@ -119,11 +109,9 @@ if ($EnvContent["GITHUB_USERNAME"] -and $EnvContent["GITHUB_PAT"])
     Write-Host "   📦 Configuring local NuGet source '$SourceName'..." -ForegroundColor Gray
     try
     {
-        # Check if source exists
         $SourceList = dotnet nuget list source | Out-String
         if ($SourceList -match $SourceName)
         {
-            # Update existing
             dotnet nuget update source $SourceName `
                 --username $EnvContent["GITHUB_USERNAME"] `
                 --password $EnvContent["GITHUB_PAT"] `
@@ -132,7 +120,6 @@ if ($EnvContent["GITHUB_USERNAME"] -and $EnvContent["GITHUB_PAT"])
         }
         else
         {
-            # Add new
             dotnet nuget add source $SourceUrl `
                 --name $SourceName `
                 --username $EnvContent["GITHUB_USERNAME"] `
@@ -147,15 +134,11 @@ if ($EnvContent["GITHUB_USERNAME"] -and $EnvContent["GITHUB_PAT"])
     }
 }
 
-# 2e. Save .env file
 $FinalEnvContent = $EnvContent.GetEnumerator() | ForEach-Object { "$( $_.Key )=$( $_.Value )" }
 $FinalEnvContent | Set-Content -Path $EnvFilePath
 Write-Host "   ✅ Environment variables saved to: $EnvFilePath" -ForegroundColor Green
 
-# 2f. Add .env file to .gitignore
 
-
-# --- 3. Initialize Root Compose (Infrastructure) ---
 Write-Host "`n🏗️  Configuring Infrastructure..." -ForegroundColor Yellow
 
 if (-not (Test-Path $RootComposePath))
@@ -215,7 +198,6 @@ else
     Write-Host "   ℹ️  Root compose file already exists. Skipping." -ForegroundColor Gray
 }
 
-# --- 4. Initialize Home Assistant Config ---
 Write-Host "`n🏠 Configuring Home Assistant..." -ForegroundColor Yellow
 if (-not (Test-Path $HaConfigPath))
 {
@@ -254,7 +236,6 @@ else
     Write-Host "   ℹ️  Home Assistant config already exists. Skipping." -ForegroundColor Gray
 }
 
-# --- 5. Install Template ---
 Write-Host "`n📦 Verifying Template..." -ForegroundColor Yellow
 hamqtt template install
 

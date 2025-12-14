@@ -5,7 +5,6 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Basic SemVer validation
 if ($Version -notmatch '^\d+\.\d+\.\d+(-[a-zA-Z0-9.]+)?(\+[a-zA-Z0-9.]+)?$') {
     Write-Error "Invalid SemVer version string: $Version"
     exit 1
@@ -28,7 +27,6 @@ foreach ($RelPath in $ProjectFiles) {
         Write-Host "   Updating $RelPath" -ForegroundColor Yellow
         $Content = Get-Content $FullPath -Raw
         
-        # Regex update for <Version> tag
         if ($Content -match "<Version>.*?</Version>") {
             $NewContent = $Content -replace "<Version>.*?</Version>", "<Version>$Version</Version>"
             $NewContent | Set-Content $FullPath
@@ -44,13 +42,10 @@ foreach ($RelPath in $ProjectFiles) {
 if ($PathsToAdd.Count -gt 0) {
     Write-Host "`nCommitting changes..." -ForegroundColor Cyan
     
-    # Git Add
     git add $PathsToAdd
     
-    # Git Commit
     git commit -m "Bump version to $Version"
     
-    # Git Tag
     $Tag = "v$Version"
     Write-Host "Tagging version $Tag..." -ForegroundColor Cyan
     git tag $Tag

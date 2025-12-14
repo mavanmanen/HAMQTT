@@ -15,15 +15,12 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# --- Import Shared Functions & Assert Wrapper ---
 . "$PSScriptRoot/Common-Utils.ps1"
 
-# --- Constants ---
 $RootComposePath = Join-Path $ProjectRoot "docker-compose.dev.yml"
 
 Write-Host "🚀 Starting Integration Synchronization..." -ForegroundColor Cyan
 
-# --- 1. Scan Disk for Actual Integrations ---
 Write-Host "   🔍 Scanning '$ProjectRoot' for projects..." -ForegroundColor Yellow
 if (-not (Test-Path $ProjectRoot))
 {
@@ -37,12 +34,10 @@ foreach ($dir in $IntegrationDirs)
 {
     $ComposePath = Join-Path $dir.FullName "docker-compose.dev.yml"
 
-    # Use dir name directly
     $CleanName = $dir.Name
 
     if (-not (Test-Path $ComposePath))
     {
-        # --- CASE A: File Missing (Regenerate) ---
         Write-Host "   ⚠️  Missing docker-compose.dev.yml for '$( $dir.Name )'." -ForegroundColor Yellow
         Write-Host "      🛠️  Regenerating file..." -ForegroundColor Gray
         try
@@ -58,8 +53,6 @@ foreach ($dir in $IntegrationDirs)
     }
     else
     {
-        # --- CASE B: File Exists (Surgical Update) ---
-        # We want to update the definition of the main service, but keep any manual additions
         try
         {
             $DidUpdate = Update-IntegrationServiceInCompose -IntegrationName $CleanName -FilePath $ComposePath
@@ -78,13 +71,11 @@ foreach ($dir in $IntegrationDirs)
         }
     }
 
-    # If we are here, the file exists
     $FoundProjects += $dir.Name
 }
 
 Write-Host "      Found $( $FoundProjects.Count ) valid integration(s)." -ForegroundColor Gray
 
-# --- 2. Read and Parse Root Compose File ---
 if (-not (Test-Path $RootComposePath))
 {
     Write-Warning "   ⚠️  Root compose file not found at $RootComposePath. Please run Initialize-Project.ps1."
@@ -93,7 +84,6 @@ if (-not (Test-Path $RootComposePath))
 
 $Content = Get-Content -Path $RootComposePath -Raw
 
-# --- 3. Reconstruct the 'include' Section ---
 Write-Host "   🔄 Updating 'include' section..." -ForegroundColor Yellow
 
 if ($FoundProjects.Count -gt 0)
@@ -103,12 +93,10 @@ if ($FoundProjects.Count -gt 0)
     {
         $NewIncludeBlock += "`n  - ${ProjectName}/docker-compose.dev.yml"
     }
-    # IMPORTANT: Add trailing newline to separate from 'services:' block
     $NewIncludeBlock += "`n"
 }
 else
 {
-    # If no projects, remove the include block entirely
     $NewIncludeBlock = ""
 }
 
@@ -122,12 +110,10 @@ if ($Content -match $Regex)
 }
 else
 {
-    # Only inject if we actually have includes
     if ($NewIncludeBlock -ne "")
     {
         if ($Content -match "^services:")
         {
-            # Inject before services, ensuring we have a newline separator
             $NewContent = $Content -replace "^services:", "${NewIncludeBlock}`nservices:"
             $NewContent | Set-Content -Path $RootComposePath
             Write-Host "   ✅ 'include' section missing; injected successfully." -ForegroundColor Green
@@ -143,7 +129,6 @@ else
     }
 }
 
-# --- 4. Final Status ---
 Write-Host "`n✨ Synchronization Complete!" -ForegroundColor Cyan
 if ($FoundProjects.Count -gt 0)
 {

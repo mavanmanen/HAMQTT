@@ -11,14 +11,11 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# --- Import Shared Functions & Assert Wrapper ---
 . "$PSScriptRoot/Common-Utils.ps1"
 
-# --- Constants ---
 $DevComposePath = Join-Path $ProjectRoot "docker-compose.dev.yml"
 $ProdComposePath = Join-Path $ProjectRoot "docker-compose.yml"
 
-# --- 1. Gather Data ---
 if (-not (Test-Path $ProjectRoot))
 {
     Write-Warning "Source directory not found at $ProjectRoot"
@@ -33,7 +30,6 @@ if ($Integrations.Count -eq 0)
     return
 }
 
-# --- 2. Parse Dev Compose (Includes) ---
 $DevIncludes = @()
 if (Test-Path $DevComposePath)
 {
@@ -44,33 +40,19 @@ if (Test-Path $DevComposePath)
     }
 }
 
-# --- 3. Parse Prod Compose (Services) ---
 $ProdServices = @()
 if (Test-Path $ProdComposePath)
 {
-    # CHANGED: Removed -Raw to read as array of lines.
-    # This ensures the regex ^ anchor matches the start of every line, not just the start of the file.
     $ProdContent = Get-Content $ProdComposePath
     $ProdServices = $ProdContent | Select-String -Pattern "^\s+hamqtt-integration-([a-zA-Z0-9-]+):" | ForEach-Object { $_.Matches.Groups[1].Value }
 }
 
-# --- 4. Build Status Table ---
 $StatusList = @()
 
 foreach ($dir in $Integrations)
 {
-    # Ignore the base library project
-    if ($dir.Name -eq "HAMQTT.Integration")
-    {
-        continue
-    }
-
-    # Use shared function to get clean name
     $KebabName = Get-KebabCase $dir.Name
 
-    # Check Dev Status
-    # We check if the expected line exists in the root compose file.
-    # We do NOT skip if the local file is missing; we simply report it as not configured (Orphaned).
     $ExpectedIncludePart = "${dir.Name}/docker-compose.dev.yml"
     $IsDev = $false
 
@@ -83,18 +65,14 @@ foreach ($dir in $Integrations)
         }
     }
 
-    # Check Prod Status
     $IsProd = $ProdServices -contains $KebabName
 
-    # Determine Status Label
     $Status = "Active"
     if (-not $IsDev)
     {
         $Status = "ORPHANED"
     }
 
-    # Optional: You can indicate file missing in the "Dev Configured" column if desired,
-    # but based on your request, we treat it standardly.
     $DisplayDev = if ($IsDev)
     {
         "Yes"
@@ -104,7 +82,6 @@ foreach ($dir in $Integrations)
         "NO"
     }
 
-    # If the file is actually missing on disk, we might want to flag that slightly in the NO status
     if (-not (Test-Path (Join-Path $dir.FullName "docker-compose.dev.yml")))
     {
         if (-not $IsDev)
@@ -128,7 +105,6 @@ foreach ($dir in $Integrations)
     }
 }
 
-# --- 5. Output ---
 Write-Host "`n📊 Integration Status Report" -ForegroundColor Cyan
 $StatusList | Format-Table -AutoSize
 

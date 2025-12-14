@@ -6,7 +6,6 @@
 #>
 
 param (
-# CHANGED: Mandatory=$false so we can prompt interactively if missing
     [Parameter(Mandatory = $false)]
     [string]$IntegrationName,
 
@@ -18,10 +17,8 @@ param (
 
 $ErrorActionPreference = "Stop"
 
-# --- Import Shared Functions & Assert Wrapper ---
 . "$PSScriptRoot/Common-Utils.ps1"
 
-# --- Interactive Mode ---
 if ( [string]::IsNullOrWhiteSpace($IntegrationName))
 {
     Write-Host "📝 New Integration Setup" -ForegroundColor Cyan
@@ -37,15 +34,12 @@ if ( [string]::IsNullOrWhiteSpace($IntegrationName))
     }
 }
 
-# --- Constants ---
 $RootComposePath = Join-Path $ProjectRoot "docker-compose.dev.yml"
 
-# --- 1. Setup Variables ---
 $ProjectRelPath = Join-Path $ProjectRoot ${IntegrationName}
 
 Write-Host "🚀 Starting setup for '${IntegrationName}'..." -ForegroundColor Cyan
 
-# --- 2. Run dotnet new ---
 Write-Host "`n🔨 Generating Project..." -ForegroundColor Yellow
 $RootLocation = Get-Location
 
@@ -57,7 +51,6 @@ try
     }
     Set-Location $ProjectRoot
 
-    # Assumes template is already installed via 'hamqtt init' or 'hamqtt template install'
     dotnet new hamqtt-integration `
         --integration-name $IntegrationName `
         --force
@@ -79,17 +72,14 @@ finally
 }
 Write-Host "   ✅ Project generated at: ${ProjectRelPath}" -ForegroundColor Green
 
-# --- 3. Create Project-Level Docker Compose ---
 Write-Host "`n🐳 Creating Project Docker Compose..." -ForegroundColor Yellow
 
 $ComposePath = Join-Path $ProjectRelPath "docker-compose.dev.yml"
 
-# Call Shared Function
 New-IntegrationComposeFile -IntegrationName $IntegrationName -OutputPath $ComposePath
 
 Write-Host "   ✅ Created: ${ComposePath}" -ForegroundColor Green
 
-# --- 4. Update Root Docker Compose (Includes) ---
 Write-Host "`n🔗 Registering Integration in Root Docker Compose..." -ForegroundColor Yellow
 
 if (Test-Path $RootComposePath)

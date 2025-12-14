@@ -23,14 +23,7 @@ function Get-KebabCase
         return $InputString
     }
 
-    # CRITICAL: Use -creplace (Case-Sensitive) so [a-z] doesn't match [A-Z].
-
-    # 1. Handle Acronyms (e.g., XMLParser -> XML-Parser)
-    #    Matches an Uppercase followed by Uppercase+Lowercase
     $s = $InputString -creplace '([A-Z])([A-Z][a-z])', '$1-$2'
-
-    # 2. Handle PascalCase (e.g., SolarEdge -> Solar-Edge)
-    #    Matches a Lowercase followed by an Uppercase
     $s = $s -creplace '([a-z])([A-Z])', '$1-$2'
 
     return $s.ToLower()
@@ -76,9 +69,6 @@ function Set-EnvVariable
 function Get-IntegrationServiceBlock
 {
     param ($KebabName)
-
-    # Returns the YAML string for the service definition
-    # Indented by 2 spaces to match 'services:' children
 
     return @"
   hamqtt-integration-${KebabName}:
@@ -145,17 +135,6 @@ function Update-IntegrationServiceInCompose
     $CurrentContent = Get-Content -Path $FilePath -Raw
     $NewServiceBlock = Get-IntegrationServiceBlock -KebabName $KebabName
 
-    # Regex breakdown:
-    # (?ms)        : Multi-line and Single-line mode (dot matches newline)
-    # ^\s{2}       : Start of line with exactly 2 spaces (indentation of a service)
-    # SERVICE_NAME : The specific service key we want to replace
-    # :            : The colon after the key
-    # .*?          : Non-greedy match of the service body
-    # (?=...)      : Lookahead (stop matching when...)
-    # ^\s{2}\S     : ...we find the start of the NEXT service (2 spaces + non-whitespace)
-    # |            : OR
-    # \Z           : ...we reach the End of File
-
     $Regex = "(?ms)^\s{2}${ServiceName}:.*?(?=^\s{2}\S|\Z)"
 
     if ($CurrentContent -match $Regex)
@@ -166,8 +145,6 @@ function Update-IntegrationServiceInCompose
     }
     else
     {
-        # Edge Case: The file exists but this specific service key isn't found (maybe renamed?)
-        # In this case, we append it to the services block if possible, or warn.
         if ($CurrentContent -match "^services:")
         {
             $UpdatedContent = $CurrentContent -replace "^services:", "services:`n${NewServiceBlock}"

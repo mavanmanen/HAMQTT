@@ -16,10 +16,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-# Resolve scripts relative to this file (which lives in the tool install dir now)
 $ScriptsDir = Join-Path $PSScriptRoot "scripts"
 
-# --- Argument Parsing ---
 $ProjectRootArg = $null
 $CleanedExtraArgs = @()
 
@@ -41,7 +39,6 @@ if ($ExtraArgs) {
 }
 $ExtraArgs = $CleanedExtraArgs
 
-# --- Helper: Print Usage ---
 function Show-Usage
 {
     Write-Host "Usage:" -ForegroundColor Yellow
@@ -108,11 +105,9 @@ switch ($Context)
     }
 
     "update" {
-        # The tool handles its own updates via NuGet now
         Write-Host "📦 To update HAMQTT, please run:" -ForegroundColor Cyan
         Write-Host "   dotnet tool update -g HAMQTT.CLI" -ForegroundColor Yellow
 
-        # Also auto-update templates
         Write-Host "`n📦 Updating templates..." -ForegroundColor Cyan
         dotnet new update
     }
@@ -172,7 +167,6 @@ switch ($Context)
                 $IntName = $null
                 $FolderName = $null
                 
-                # Parse args
                 for ($i = 0; $i -lt $ExtraArgs.Count; $i++) {
                     $arg = $ExtraArgs[$i]
                     if ($arg -eq "-ProjectFolderName" -or $arg -eq "--project-folder-name") {
@@ -196,7 +190,6 @@ switch ($Context)
                 $MqttUsername = $null
                 $MqttPassword = $null
 
-                # Parse args
                 for ($i = 0; $i -lt $ExtraArgs.Count; $i++) {
                     $arg = $ExtraArgs[$i]
                     if ($arg -eq "--mqtt-host") {

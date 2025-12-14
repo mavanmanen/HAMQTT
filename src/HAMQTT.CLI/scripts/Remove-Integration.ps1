@@ -6,7 +6,6 @@
 #>
 
 param (
-# Changed to False to allow custom interactive prompt
     [Parameter(Mandatory = $false)]
     [string]$IntegrationName,
 
@@ -18,13 +17,10 @@ param (
 
 $ErrorActionPreference = "Stop"
 
-# --- Import Shared Functions & Assert Wrapper ---
 . "$PSScriptRoot/Common-Utils.ps1"
 
-# --- Constants ---
 $RootComposePath = Join-Path $ProjectRoot "docker-compose.dev.yml"
 
-# --- Interactive Mode ---
 if ([string]::IsNullOrWhiteSpace($IntegrationName) -and [string]::IsNullOrWhiteSpace($ProjectFolderName))
 {
     if (-not (Test-Path $ProjectRoot))
@@ -33,7 +29,6 @@ if ([string]::IsNullOrWhiteSpace($IntegrationName) -and [string]::IsNullOrWhiteS
         exit 1
     }
 
-    # Get list of integrations (excluding base project)
     $Integrations = Get-Integrations
 
     if ($Integrations.Count -eq 0)
@@ -56,15 +51,12 @@ if ([string]::IsNullOrWhiteSpace($IntegrationName) -and [string]::IsNullOrWhiteS
 
     $Selection = Read-Host "`n   > Enter number or name"
 
-    # Validate Selection
     if ($Selection -match "^\d+$" -and $Map.ContainsKey([int]$Selection))
     {
-        # User entered a valid number
         $IntegrationName = $Map[[int]$Selection]
     }
     elseif ($Integrations | Where-Object { ($_.Name) -eq $Selection })
     {
-        # User entered a valid name
         $IntegrationName = $Selection
     }
     else
@@ -76,7 +68,6 @@ if ([string]::IsNullOrWhiteSpace($IntegrationName) -and [string]::IsNullOrWhiteS
     Write-Host "   Selected: $IntegrationName" -ForegroundColor Gray
 }
 
-# --- 1. Identify Paths ---
 if ([string]::IsNullOrWhiteSpace($ProjectFolderName))
 {
     $ProjectFolderName = ${IntegrationName}
@@ -90,7 +81,6 @@ $ProjectRelPath = Join-Path $ProjectRoot $ProjectFolderName
 
 Write-Host "🗑️  Starting removal for '${IntegrationName}'..." -ForegroundColor Cyan
 
-# --- 2. Update Root Docker Compose (Remove Include) ---
 if (Test-Path $RootComposePath)
 {
     Write-Host "   🔗 Checking root compose file..." -ForegroundColor Yellow
@@ -116,7 +106,6 @@ else
     Write-Warning "   ⚠️  Root compose file not found at ${RootComposePath}"
 }
 
-# --- 3. Remove from Solution ---
 $SolutionFile = Get-ChildItem -Path $ProjectRoot -Filter "*.sln" | Select-Object -First 1
 $CsprojPath = Join-Path $ProjectRelPath "${ProjectFolderName}.csproj"
 
@@ -136,7 +125,6 @@ if ($SolutionFile -and (Test-Path $CsprojPath))
     }
 }
 
-# --- 4. Remove Workflow File ---
 $KebabName = Get-KebabCase $IntegrationName
 $WorkflowPath = Join-Path $ProjectRoot ".." ".github" "workflows" "${KebabName}.yml"
 $WorkflowPath = [System.IO.Path]::GetFullPath($WorkflowPath)
@@ -155,7 +143,6 @@ if (Test-Path $WorkflowPath)
     }
 }
 
-# --- 5. Remove Project Directory ---
 if (Test-Path $ProjectRelPath)
 {
     Write-Host "   📂 Removing project directory..." -ForegroundColor Yellow
@@ -174,7 +161,6 @@ else
     Write-Host "   ℹ️  Directory not found: ${ProjectRelPath} (skipping)" -ForegroundColor Gray
 }
 
-# --- 6. Final Instructions ---
 Write-Host "`n✨ Removal Complete!" -ForegroundColor Cyan
 Write-Host "   ⚠️  To apply changes and remove the running container, run:" -ForegroundColor Gray
 Write-Host "      docker-compose -f docker-compose.dev.yml up -d --remove-orphans" -ForegroundColor White

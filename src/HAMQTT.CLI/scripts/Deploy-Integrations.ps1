@@ -4,7 +4,6 @@
 #>
 
 param (
-# Defaults to the repository root
     [string]$OutputDirectory,
     [string]$ProjectRoot,
 
@@ -20,10 +19,8 @@ param (
 
 $ErrorActionPreference = "Stop"
 
-# --- Import Shared Functions & Assert Wrapper ---
 . "$PSScriptRoot/Common-Utils.ps1"
 
-# --- Determine Image Base URL from Git ---
 try
 {
     $OriginUrl = git config --get remote.origin.url
@@ -32,10 +29,7 @@ try
         throw "Git remote 'origin' not found."
     }
 
-    # Normalize URL (Handle HTTPS and SSH)
-    # Remove protocol and domain (github.com)
     $RepoPath = $OriginUrl -replace '^(https?://|git@)github\.com[:/]', ''
-    # Remove .git suffix
     $RepoPath = $RepoPath -replace '\.git$', ''
     
     $ImageBaseUrl = "ghcr.io/${RepoPath}".ToLower()
@@ -47,7 +41,6 @@ catch
     exit 1
 }
 
-# --- Prompt for Credentials if Missing ---
 if ([string]::IsNullOrWhiteSpace($MqttHost)) {
     $MqttHost = Read-Host "Enter MQTT Host"
 }
@@ -61,20 +54,17 @@ if ([string]::IsNullOrWhiteSpace($MqttPassword)) {
     $MqttPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecurePass))
 }
 
-# --- Constants ---
 if ( [string]::IsNullOrEmpty($OutputDirectory))
 {
     $OutputDirectory = $ProjectRoot
 }
 
-# --- 1. Prepare Output Directory ---
 if (-not (Test-Path $OutputDirectory))
 {
     New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
 }
 Write-Host "🚀 Starting deployment generation in '$OutputDirectory'..." -ForegroundColor Cyan
 
-# --- 3. Scan for Integrations ---
 Write-Host "   🔍 Scanning for integrations..." -ForegroundColor Yellow
 $Integrations = Get-Integrations
 
@@ -83,19 +73,16 @@ if ($Integrations.Count -eq 0)
     Write-Warning "   ⚠️  No integrations found."
 }
 
-# --- 4. Build Docker Compose Content ---
 $ServicesYaml = ""
 
 foreach ($dir in $Integrations)
 {
-    # Skip if not a valid project (must have a compose file)
     $ProjectComposePath = Join-Path $dir.FullName "docker-compose.dev.yml"
     if (-not (Test-Path $ProjectComposePath))
     {
         continue
     }
 
-    # Use dir name directly
     $CleanName = $dir.Name
     $KebabName = Get-KebabCase $CleanName
     $ImageUrl = "${ImageBaseUrl}/${KebabName}:latest"
@@ -120,7 +107,6 @@ foreach ($dir in $Integrations)
     }
 }
 
-# --- 5. Assemble Final File ---
 $FinalCompose = @"
 version: '3.8'
 
