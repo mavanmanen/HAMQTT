@@ -69,16 +69,14 @@ foreach ($dir in $Integrations)
     restart: unless-stopped
     network_mode: bridge
     environment:
-      - MQTT_HOST
-      - MQTT_USERNAME
-      - MQTT_PASSWORD
+      <<: *environment
 "@
 
     $envFilePath = Join-Path $dir.FullName ".env"
     $envFileContent = Get-Content -Path $envFilePath -ErrorAction SilentlyContinue
     foreach($line in $envFileContent)
     {
-        $ServicesYaml += "\n      - " + $line
+        $ServicesYaml += "\n      - " + ($line -replace "=", ": ")
     }
 }
 
@@ -86,10 +84,10 @@ foreach ($dir in $Integrations)
 $FinalCompose = @"
 version: '3.8'
 
-environment:
-  - MQTT_HOST=
-  - MQTT_USERNAME=
-  - MQTT_PASSWORD=
+x-env: &environment
+  MQTT_HOST: #HOST
+  MQTT_USERNAME: #USERNAME
+  MQTT_PASSWORD: #PASSWORD
 
 services:
 $ServicesYaml
