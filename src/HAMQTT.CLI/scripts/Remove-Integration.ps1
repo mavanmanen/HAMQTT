@@ -10,6 +10,9 @@ param (
     [Parameter(Mandatory = $false)]
     [string]$IntegrationName,
 
+    [Parameter(Mandatory = $false)]
+    [string]$ProjectFolderName,
+
     [string]$ProjectRoot
 )
 
@@ -22,7 +25,7 @@ $ErrorActionPreference = "Stop"
 $RootComposePath = Join-Path $ProjectRoot "docker-compose.dev.yml"
 
 # --- Interactive Mode ---
-if ( [string]::IsNullOrWhiteSpace($IntegrationName))
+if ([string]::IsNullOrWhiteSpace($IntegrationName) -and [string]::IsNullOrWhiteSpace($ProjectFolderName))
 {
     if (-not (Test-Path $ProjectRoot))
     {
@@ -76,7 +79,23 @@ if ( [string]::IsNullOrWhiteSpace($IntegrationName))
 }
 
 # --- 1. Identify Paths ---
-$ProjectFolderName = "HAMQTT.Integration.${IntegrationName}"
+if ([string]::IsNullOrWhiteSpace($ProjectFolderName))
+{
+    $ProjectFolderName = "HAMQTT.Integration.${IntegrationName}"
+}
+elseif ([string]::IsNullOrWhiteSpace($IntegrationName))
+{
+    # Try to derive IntegrationName for display if not provided
+    if ($ProjectFolderName -match "^HAMQTT\.Integration\.(.+)$")
+    {
+        $IntegrationName = $Matches[1]
+    }
+    else
+    {
+        $IntegrationName = $ProjectFolderName
+    }
+}
+
 $ProjectRelPath = Join-Path $ProjectRoot $ProjectFolderName
 
 Write-Host "🗑️  Starting removal for '${IntegrationName}'..." -ForegroundColor Cyan

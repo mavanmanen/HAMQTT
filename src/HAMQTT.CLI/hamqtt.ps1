@@ -169,15 +169,24 @@ switch ($Context)
                 & "$ScriptsDir/New-Integration.ps1" -IntegrationName $Name -ProjectRoot $ProjectRootArg
             }
             "remove" {
-                $Name = if ($ExtraArgs)
-                {
-                    $ExtraArgs[0]
+                $IntName = $null
+                $FolderName = $null
+                
+                # Parse args
+                for ($i = 0; $i -lt $ExtraArgs.Count; $i++) {
+                    $arg = $ExtraArgs[$i]
+                    if ($arg -eq "-ProjectFolderName" -or $arg -eq "--project-folder-name") {
+                        if ($i + 1 -lt $ExtraArgs.Count) {
+                            $FolderName = $ExtraArgs[$i + 1]
+                            $i++
+                        }
+                    }
+                    elseif ($arg -notlike "-*") {
+                        $IntName = $arg
+                    }
                 }
-                else
-                {
-                    $null
-                }
-                & "$ScriptsDir/Remove-Integration.ps1" -IntegrationName $Name -ProjectRoot $ProjectRootArg
+
+                & "$ScriptsDir/Remove-Integration.ps1" -IntegrationName $IntName -ProjectFolderName $FolderName -ProjectRoot $ProjectRootArg
             }
             "update" {
                 & "$ScriptsDir/Update-Integrations.ps1" -ProjectRoot $ProjectRootArg
