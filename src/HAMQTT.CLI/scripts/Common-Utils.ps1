@@ -4,7 +4,13 @@
 #>
 
 # --- Global Path Definitions ---
-$Global:ProjectRoot = Get-Location
+if ([string]::IsNullOrWhiteSpace($ProjectRoot)) {
+    $Global:ProjectRoot = (Get-Location).Path
+} else {
+    $Global:ProjectRoot = (Resolve-Path $ProjectRoot).Path
+}
+# Ensure local scope variable is updated if it was passed in
+$ProjectRoot = $Global:ProjectRoot
 
 # --- Shared Functions ---
 

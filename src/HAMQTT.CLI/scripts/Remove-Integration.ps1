@@ -8,7 +8,9 @@
 param (
 # Changed to False to allow custom interactive prompt
     [Parameter(Mandatory = $false)]
-    [string]$IntegrationName
+    [string]$IntegrationName,
+
+    [string]$ProjectRoot
 )
 
 $ErrorActionPreference = "Stop"

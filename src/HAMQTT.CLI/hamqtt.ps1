@@ -19,6 +19,28 @@ $ErrorActionPreference = "Stop"
 # Resolve scripts relative to this file (which lives in the tool install dir now)
 $ScriptsDir = Join-Path $PSScriptRoot "scripts"
 
+# --- Argument Parsing ---
+$ProjectRootArg = $null
+$CleanedExtraArgs = @()
+
+if ($ExtraArgs) {
+    for ($i = 0; $i -lt $ExtraArgs.Count; $i++) {
+        $arg = $ExtraArgs[$i]
+        if ($arg -eq "--root" -or $arg -eq "-ProjectRoot") {
+            if ($i + 1 -lt $ExtraArgs.Count) {
+                $ProjectRootArg = $ExtraArgs[$i + 1]
+                $i++ # Skip next arg
+            } else {
+                Write-Error "Missing value for --root argument."
+                exit 1
+            }
+        } else {
+            $CleanedExtraArgs += $arg
+        }
+    }
+}
+$ExtraArgs = $CleanedExtraArgs
+
 # --- Helper: Print Usage ---
 function Show-Usage
 {
@@ -41,13 +63,17 @@ $Context = $Context.ToLower()
 switch ($Context)
 {
     "init" {
-        & "$ScriptsDir/Init-Project.ps1"
+        & "$ScriptsDir/Init-Project.ps1" -ProjectRoot $ProjectRootArg
     }
 
     "run" {
         if ($Command -eq "dev")
         {
-            $ProjectRoot = Get-Location
+            if ($ProjectRootArg) {
+                $ProjectRoot = (Resolve-Path $ProjectRootArg).Path
+            } else {
+                $ProjectRoot = Get-Location
+            }
             $ComposeFile = Join-Path $ProjectRoot "docker-compose.dev.yml"
             $BareMode = $ExtraArgs -contains "--bare"
 
@@ -129,7 +155,7 @@ switch ($Context)
         switch ($Command)
         {
             "list" {
-                & "$ScriptsDir/List-Integrations.ps1"
+                & "$ScriptsDir/List-Integrations.ps1" -ProjectRoot $ProjectRootArg
             }
             "new" {
                 $Name = if ($ExtraArgs)
@@ -140,7 +166,7 @@ switch ($Context)
                 {
                     $null
                 }
-                & "$ScriptsDir/New-Integration.ps1" -IntegrationName $Name
+                & "$ScriptsDir/New-Integration.ps1" -IntegrationName $Name -ProjectRoot $ProjectRootArg
             }
             "remove" {
                 $Name = if ($ExtraArgs)
@@ -151,13 +177,13 @@ switch ($Context)
                 {
                     $null
                 }
-                & "$ScriptsDir/Remove-Integration.ps1" -IntegrationName $Name
+                & "$ScriptsDir/Remove-Integration.ps1" -IntegrationName $Name -ProjectRoot $ProjectRootArg
             }
             "update" {
-                & "$ScriptsDir/Update-Integrations.ps1"
+                & "$ScriptsDir/Update-Integrations.ps1" -ProjectRoot $ProjectRootArg
             }
             "deploy" {
-                & "$ScriptsDir/Deploy-Integrations.ps1"
+                & "$ScriptsDir/Deploy-Integrations.ps1" -ProjectRoot $ProjectRootArg
             }
             Default {
                 Show-Usage

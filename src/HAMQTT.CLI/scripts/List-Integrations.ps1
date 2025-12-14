@@ -5,6 +5,10 @@
     Scans and compares dev/prod compose files.
 #>
 
+param(
+    [string]$ProjectRoot
+)
+
 $ErrorActionPreference = "Stop"
 
 # --- Import Shared Functions & Assert Wrapper ---

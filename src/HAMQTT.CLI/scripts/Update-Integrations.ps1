@@ -9,6 +9,10 @@
     3. Rebuilds the 'include:' section of the root compose file.
 #>
 
+param(
+    [string]$ProjectRoot
+)
+
 $ErrorActionPreference = "Stop"
 
 # --- Import Shared Functions & Assert Wrapper ---

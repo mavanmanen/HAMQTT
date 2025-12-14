@@ -6,7 +6,8 @@
 param (
 # Defaults to the repository root
     [string]$OutputDirectory,
-    [string]$ImageBaseUrl = "ghcr.io/mavanmanen/hamqtt.net"
+    [string]$ImageBaseUrl = "ghcr.io/mavanmanen/hamqtt.net",
+    [string]$ProjectRoot
 )
 
 $ErrorActionPreference = "Stop"
@@ -60,8 +61,6 @@ foreach ($dir in $Integrations)
     $ImageUrl = "${ImageBaseUrl}/${KebabName}:latest"
 
     Write-Host "      Found: $CleanName -> Image: $ImageUrl" -ForegroundColor Gray
-    
-    
 
     $ServicesYaml += @"
   hamqtt-integration-${KebabName}:
@@ -69,15 +68,25 @@ foreach ($dir in $Integrations)
     image: ${ImageUrl}
     restart: unless-stopped
     network_mode: bridge
-
+    environment:
+      - MQTT_HOST
+      - MQTT_USERNAME
+      - MQTT_PASSWORD
 "@
+
+    $envFilePath = Join-Path $dir.FullName ".env"
+    $envFileContent = Get-Content -Path $envFilePath -ErrorAction SilentlyContinue
+    foreach($line in $envFileContent)
+    {
+        $ServicesYaml += "      - " + $lines 
+    }
 }
 
 # --- 5. Assemble Final File ---
 $FinalCompose = @"
 version: '3.8'
 
-environemnt:
+environment:
   - MQTT_HOST=
   - MQTT_USERNAME=
   - MQTT_PASSWORD=
