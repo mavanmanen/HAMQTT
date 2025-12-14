@@ -30,7 +30,7 @@
       ]
     },
     {
-      "source": "./workflows/",
+      "source": "./HAMQTT.Integration.IntegrationName/workflows/",
       "target": "../.github/workflows/",
       "include": [
         "integration-name.yml"
