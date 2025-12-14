@@ -34,8 +34,7 @@ if ([string]::IsNullOrWhiteSpace($IntegrationName) -and [string]::IsNullOrWhiteS
     }
 
     # Get list of integrations (excluding base project)
-    $Integrations = Get-ChildItem -Path $ProjectRoot -Directory -Filter "HAMQTT.Integration.*" |
-            Where-Object { $_.Name -ne "HAMQTT.Integration" }
+    $Integrations = Get-Integrations
 
     if ($Integrations.Count -eq 0)
     {
@@ -50,9 +49,8 @@ if ([string]::IsNullOrWhiteSpace($IntegrationName) -and [string]::IsNullOrWhiteS
 
     foreach ($dir in $Integrations)
     {
-        $CleanName = Get-CleanIntegrationName $dir.Name
-        Write-Host "   [$Index] $CleanName"
-        $Map[$Index] = $CleanName
+        Write-Host "   [$Index] $dir.Name"
+        $Map[$Index] = $dir.Name
         $Index++
     }
 
@@ -64,7 +62,7 @@ if ([string]::IsNullOrWhiteSpace($IntegrationName) -and [string]::IsNullOrWhiteS
         # User entered a valid number
         $IntegrationName = $Map[[int]$Selection]
     }
-    elseif ($Integrations | Where-Object { (Get-CleanIntegrationName $_.Name) -eq $Selection })
+    elseif ($Integrations | Where-Object { ($_.Name) -eq $Selection })
     {
         # User entered a valid name
         $IntegrationName = $Selection
@@ -81,19 +79,11 @@ if ([string]::IsNullOrWhiteSpace($IntegrationName) -and [string]::IsNullOrWhiteS
 # --- 1. Identify Paths ---
 if ([string]::IsNullOrWhiteSpace($ProjectFolderName))
 {
-    $ProjectFolderName = "HAMQTT.Integration.${IntegrationName}"
+    $ProjectFolderName = ${IntegrationName}
 }
 elseif ([string]::IsNullOrWhiteSpace($IntegrationName))
 {
-    # Try to derive IntegrationName for display if not provided
-    if ($ProjectFolderName -match "^HAMQTT\.Integration\.(.+)$")
-    {
-        $IntegrationName = $Matches[1]
-    }
-    else
-    {
-        $IntegrationName = $ProjectFolderName
-    }
+    $IntegrationName = $ProjectFolderName
 }
 
 $ProjectRelPath = Join-Path $ProjectRoot $ProjectFolderName

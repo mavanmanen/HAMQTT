@@ -30,17 +30,11 @@ if (-not (Test-Path $ProjectRoot))
     Write-Error "   ❌ Source directory not found at $ProjectRoot"
 }
 
-$IntegrationDirs = Get-ChildItem -Path $ProjectRoot -Directory -Filter "HAMQTT.Integration.*"
+$IntegrationDirs = Get-Integrations
 $FoundProjects = @()
 
 foreach ($dir in $IntegrationDirs)
 {
-    # Ignore the base library project
-    if ($dir.Name -eq "HAMQTT.Integration")
-    {
-        continue
-    }
-
     $ComposePath = Join-Path $dir.FullName "docker-compose.dev.yml"
 
     # Use shared function to get clean name

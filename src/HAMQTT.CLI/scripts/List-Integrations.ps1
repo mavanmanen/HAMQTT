@@ -25,7 +25,7 @@ if (-not (Test-Path $ProjectRoot))
     return
 }
 
-$Integrations = Get-ChildItem -Path $ProjectRoot -Directory -Filter "HAMQTT.Integration.*"
+$Integrations = Get-Integrations
 
 if ($Integrations.Count -eq 0)
 {
@@ -66,8 +66,7 @@ foreach ($dir in $Integrations)
     }
 
     # Use shared function to get clean name
-    $CleanName = Get-CleanIntegrationName $dir.Name
-    $KebabName = Get-KebabCase $CleanName
+    $KebabName = Get-KebabCase $dir.Name
 
     # Check Dev Status
     # We check if the expected line exists in the root compose file.
@@ -115,7 +114,7 @@ foreach ($dir in $Integrations)
     }
 
     $StatusList += [PSCustomObject]@{
-        "Integration Name" = $CleanName
+        "Integration Name" = $dir.Name
         "Dev Configured" = $DisplayDev
         "Prod Deployed" = if ($IsProd)
         {

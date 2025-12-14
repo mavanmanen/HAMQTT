@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		hamqtt-integration-workflow.yml = ..\.github\workflows\hamqtt-integration-workflow.yml
 		hamqtt-nuget.yml = ..\.github\workflows\hamqtt-nuget.yml
 		hamqtt-build-pack.yml = ..\.github\workflows\hamqtt-build-pack.yml
+		Bump-Version.ps1 = Bump-Version.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Template", "Template", "{605B6A57-5635-4CF4-BC34-B48659F07E23}"

@@ -41,10 +41,9 @@ if ( [string]::IsNullOrWhiteSpace($IntegrationName))
 $RootComposePath = Join-Path $ProjectRoot "docker-compose.dev.yml"
 
 # --- 1. Setup Variables ---
-$ProjectFolderName = "HAMQTT.Integration.${IntegrationName}"
-$ProjectRelPath = Join-Path $ProjectRoot $ProjectFolderName
+$ProjectRelPath = Join-Path $ProjectRoot ${IntegrationName}
 
-Write-Host "🚀 Starting setup for '${ProjectFolderName}'..." -ForegroundColor Cyan
+Write-Host "🚀 Starting setup for '${IntegrationName}'..." -ForegroundColor Cyan
 
 # --- 2. Run dotnet new ---
 Write-Host "`n🔨 Generating Project..." -ForegroundColor Yellow
@@ -96,7 +95,7 @@ Write-Host "`n🔗 Registering Integration in Root Docker Compose..." -Foregroun
 if (Test-Path $RootComposePath)
 {
     $RootContent = Get-Content $RootComposePath -Raw
-    $IncludeLine = "  - ${ProjectFolderName}/docker-compose.dev.yml"
+    $IncludeLine = "  - ${IntegrationName}/docker-compose.dev.yml"
 
     if ($RootContent -notmatch [regex]::Escape($IncludeLine))
     {

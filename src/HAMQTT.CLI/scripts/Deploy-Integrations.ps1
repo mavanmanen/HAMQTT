@@ -76,7 +76,7 @@ Write-Host "🚀 Starting deployment generation in '$OutputDirectory'..." -Foreg
 
 # --- 3. Scan for Integrations ---
 Write-Host "   🔍 Scanning for integrations..." -ForegroundColor Yellow
-$Integrations = Get-ChildItem -Path $ProjectRoot -Directory -Filter "HAMQTT.Integration.*"
+$Integrations = Get-Integrations
 
 if ($Integrations.Count -eq 0)
 {
@@ -88,12 +88,6 @@ $ServicesYaml = ""
 
 foreach ($dir in $Integrations)
 {
-    # Ignore the base library project
-    if ($dir.Name -eq "HAMQTT.Integration")
-    {
-        continue
-    }
-
     # Skip if not a valid project (must have a compose file)
     $ProjectComposePath = Join-Path $dir.FullName "docker-compose.dev.yml"
     if (-not (Test-Path $ProjectComposePath))

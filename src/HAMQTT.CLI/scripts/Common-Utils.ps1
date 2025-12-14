@@ -36,16 +36,6 @@ function Get-KebabCase
     return $s.ToLower()
 }
 
-function Get-CleanIntegrationName
-{
-    <#
-    .SYNOPSIS
-        Removes the 'HAMQTT.Integration.' prefix from a folder name.
-    #>
-    param ([string]$FolderName)
-    return $FolderName -replace "^HAMQTT\.Integration\.", ""
-}
-
 function Set-EnvVariable
 {
     param (
@@ -85,7 +75,7 @@ function Set-EnvVariable
 
 function Get-IntegrationServiceBlock
 {
-    param ($KebabName, $ProjectFolderName)
+    param ($KebabName)
 
     # Returns the YAML string for the service definition
     # Indented by 2 spaces to match 'services:' children
@@ -124,9 +114,7 @@ function New-IntegrationComposeFile
     )
 
     $KebabName = Get-KebabCase $IntegrationName
-    $ProjectFolderName = "HAMQTT.Integration.${IntegrationName}"
-
-    $ServiceBlock = Get-IntegrationServiceBlock -KebabName $KebabName -ProjectFolderName $ProjectFolderName
+    $ServiceBlock = Get-IntegrationServiceBlock -KebabName $KebabName
 
     $ComposeContent = @"
 services:
@@ -152,11 +140,10 @@ function Update-IntegrationServiceInCompose
     )
 
     $KebabName = Get-KebabCase $IntegrationName
-    $ProjectFolderName = "HAMQTT.Integration.${IntegrationName}"
     $ServiceName = "hamqtt-integration-${KebabName}"
 
     $CurrentContent = Get-Content -Path $FilePath -Raw
-    $NewServiceBlock = Get-IntegrationServiceBlock -KebabName $KebabName -ProjectFolderName $ProjectFolderName
+    $NewServiceBlock = Get-IntegrationServiceBlock -KebabName $KebabName
 
     # Regex breakdown:
     # (?ms)        : Multi-line and Single-line mode (dot matches newline)
@@ -189,4 +176,8 @@ function Update-IntegrationServiceInCompose
         }
         return $false # Could not locate service or services block
     }
+}
+
+function Get-Integrations() {
+    return Get-ChildItem -Exclude .github,ha_config | Get-ChildItem -Path $ProjectRoot -Directory
 }
