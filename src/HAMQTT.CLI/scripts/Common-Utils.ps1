@@ -29,43 +29,6 @@ function Get-KebabCase
     return $s.ToLower()
 }
 
-function Set-EnvVariable
-{
-    param (
-        [string]$Path,
-        [string]$Key,
-        [string]$Value
-    )
-    if (-not (Test-Path $Path))
-    {
-        New-Item -Path $Path -ItemType File -Force | Out-Null
-    }
-
-    $Content = Get-Content -Path $Path -ErrorAction SilentlyContinue
-    if ($null -eq $Content)
-    {
-        $Content = @()
-    }
-
-    $Pattern = "^${Key}\s*="
-    if ($Content -match $Pattern)
-    {
-        $Content = $Content | ForEach-Object { if ($_ -match $Pattern)
-        {
-            "${Key}=${Value}"
-        }
-        else
-        {
-            $_
-        } }
-    }
-    else
-    {
-        $Content += "${Key}=${Value}"
-    }
-    $Content | Set-Content -Path $Path
-}
-
 function Get-IntegrationServiceBlock
 {
     param ($KebabName)

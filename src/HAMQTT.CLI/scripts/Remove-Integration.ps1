@@ -19,8 +19,6 @@ $ErrorActionPreference = "Stop"
 
 . "$PSScriptRoot/Common-Utils.ps1"
 
-$RootComposePath = Join-Path $ProjectRoot "docker-compose.dev.yml"
-
 if ([string]::IsNullOrWhiteSpace($IntegrationName) -and [string]::IsNullOrWhiteSpace($ProjectFolderName))
 {
     if (-not (Test-Path $ProjectRoot))
@@ -81,31 +79,6 @@ $ProjectRelPath = Join-Path $ProjectRoot $ProjectFolderName
 
 Write-Host "🗑️  Starting removal for '${IntegrationName}'..." -ForegroundColor Cyan
 
-if (Test-Path $RootComposePath)
-{
-    Write-Host "   🔗 Checking root compose file..." -ForegroundColor Yellow
-
-    $Content = Get-Content $RootComposePath -Raw
-    $IncludeString = "${ProjectFolderName}/docker-compose.dev.yml"
-
-    $Lines = $Content -split "`r?`n"
-    $NewLines = $Lines | Where-Object { -not ($_ -match [regex]::Escape($IncludeString)) }
-
-    if ($Lines.Count -ne $NewLines.Count)
-    {
-        $NewLines -join "`n" | Set-Content -Path $RootComposePath
-        Write-Host "   ✅ Removed include reference from ${RootComposePath}" -ForegroundColor Green
-    }
-    else
-    {
-        Write-Host "   ℹ️  No reference found in ${RootComposePath} (skipping)" -ForegroundColor Gray
-    }
-}
-else
-{
-    Write-Warning "   ⚠️  Root compose file not found at ${RootComposePath}"
-}
-
 $SolutionFile = Get-ChildItem -Path $ProjectRoot -Filter "*.sln" | Select-Object -First 1
 $CsprojPath = Join-Path $ProjectRelPath "${ProjectFolderName}.csproj"
 
@@ -160,6 +133,9 @@ else
 {
     Write-Host "   ℹ️  Directory not found: ${ProjectRelPath} (skipping)" -ForegroundColor Gray
 }
+
+Write-Host "`n🔄 Updating Root Docker Compose..." -ForegroundColor Yellow
+& "$PSScriptRoot/Update-Integrations.ps1" -ProjectRoot $ProjectRoot
 
 Write-Host "`n✨ Removal Complete!" -ForegroundColor Cyan
 Write-Host "   ⚠️  To apply changes and remove the running container, run:" -ForegroundColor Gray

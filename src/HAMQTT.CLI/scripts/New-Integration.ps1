@@ -81,43 +81,6 @@ New-IntegrationComposeFile -IntegrationName $IntegrationName -OutputPath $Compos
 Write-Host "   ✅ Created: ${ComposePath}" -ForegroundColor Green
 
 Write-Host "`n🔗 Registering Integration in Root Docker Compose..." -ForegroundColor Yellow
-
-if (Test-Path $RootComposePath)
-{
-    $RootContent = Get-Content $RootComposePath -Raw
-    $IncludeLine = "  - ${IntegrationName}/docker-compose.dev.yml"
-
-    if ($RootContent -notmatch [regex]::Escape($IncludeLine))
-    {
-        if ($RootContent -match "(?m)^include:\s*$")
-        {
-            $NewContent = $RootContent -replace "(?m)^include:\s*$", "include:`n${IncludeLine}"
-            $NewContent | Set-Content -Path $RootComposePath
-            Write-Host "   ✅ Added reference to root compose file." -ForegroundColor Green
-        }
-        elseif ($RootContent -match "(?m)^include:")
-        {
-            $Lines = Get-Content $RootComposePath
-            $IncludeIndex = $Lines | Select-String -Pattern "^include:" -Line | Select-Object -ExpandProperty LineNumber
-
-            $Lines = [System.Collections.Generic.List[string]]$Lines
-            $Lines.Insert($IncludeIndex, $IncludeLine)
-            $Lines | Set-Content -Path $RootComposePath
-            Write-Host "   ✅ Appended reference to existing include list." -ForegroundColor Green
-        }
-        else
-        {
-            Write-Warning "   ⚠️  Could not find 'include:' section in root compose file. Please add manually."
-        }
-    }
-    else
-    {
-        Write-Host "   ℹ️  Reference already exists in root compose file." -ForegroundColor Gray
-    }
-}
-else
-{
-    Write-Warning "   ⚠️  Root compose file not found at ${RootComposePath}. Run Init-Project.ps1 first."
-}
+& "$PSScriptRoot/Update-Integrations.ps1" -ProjectRoot $ProjectRoot
 
 Write-Host "`n✨ Setup Complete! Run 'docker-compose -f docker-compose.dev.yml up -d' to start." -ForegroundColor Cyan
