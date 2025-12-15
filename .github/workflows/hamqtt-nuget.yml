@@ -12,10 +12,10 @@ jobs:
     outputs:
       version: ${{ steps.set_version.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
 
@@ -54,7 +54,7 @@ jobs:
 
   build-library:
     needs: prepare-version
-    uses: ./.github/workflows/hamqtt-build-pack.yml
+    uses: mavanmanen/HAMQTT.Net/.github/workflows/hamqtt-build-pack.yml@main
     with:
       project_path: src/HAMQTT.Integration/HAMQTT.Integration.csproj
       version: ${{ needs.prepare-version.outputs.version }}
@@ -62,7 +62,7 @@ jobs:
 
   build-template:
     needs: prepare-version
-    uses: ./.github/workflows/hamqtt-build-pack.yml
+    uses: mavanmanen/HAMQTT.Net/.github/workflows/hamqtt-build-pack.yml@main
     with:
       project_path: src/HAMQTT.Integration.Template.csproj
       version: ${{ needs.prepare-version.outputs.version }}
@@ -70,7 +70,7 @@ jobs:
       
   build-cli:
     needs: prepare-version
-    uses: ./.github/workflows/hamqtt-build-pack.yml
+    uses: mavanmanen/HAMQTT.Net/.github/workflows/hamqtt-build-pack.yml@main
     with:
       project_path: src/HAMQTT.CLI/HAMQTT.CLI.csproj
       version: ${{ needs.prepare-version.outputs.version }}
@@ -83,24 +83,24 @@ jobs:
       packages: write
     steps:
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
 
       - name: Download Library Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: hamqtt-integration
           path: packages
 
       - name: Download Template Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: hamqtt-integration-template
           path: packages
           
       - name: Download CLI Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: hamqtt-cli
           path: packages
