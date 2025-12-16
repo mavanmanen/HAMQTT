@@ -8,7 +8,7 @@
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>hamqtt</ToolCommandName>
         <PackageId>HAMQTT.CLI</PackageId>
-        <Version>1.0.14</Version>
+        <Version>2.0.0</Version>
         <Authors>mavanmanen</Authors>
         <Description>CLI tool for scaffolding and managing HAMQTT integrations.</Description>
     </PropertyGroup>

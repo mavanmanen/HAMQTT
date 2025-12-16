@@ -6,12 +6,11 @@ using ToMqttNet;
 
 namespace HAMQTT.Integration;
 
-public abstract class Integration(IMqttConnectionService mqtt) : IInvocable
+public abstract class Integration(IMqttConnectionService mqtt)
 {
-    public abstract string CronExpression { get; }
     protected abstract bool RunOnStartup { get; }
-    protected abstract MqttDeviceDiscoveryConfig GetDeviceDiscoveryConfig();
-    public abstract Task Invoke();
+
+    protected virtual MqttDeviceDiscoveryConfig? GetDeviceDiscoveryConfig() => null;
 
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
@@ -28,6 +27,10 @@ public abstract class Integration(IMqttConnectionService mqtt) : IInvocable
     internal async Task PublishDiscoveryDocumentAsync()
     {
         var deviceConfig = GetDeviceDiscoveryConfig();
+        if (deviceConfig == null)
+        {
+            return;
+        }
 
         var uniqueIdProperty = typeof(MqttDiscoveryConfig).GetProperty("UniqueId")!;
 
@@ -38,9 +41,21 @@ public abstract class Integration(IMqttConnectionService mqtt) : IInvocable
 
         await mqtt.PublishDiscoveryDocument(deviceConfig);
 
-        if (RunOnStartup)
+        if (this is CronIntegration cronIntegration && RunOnStartup)
         {
-            await Invoke();
+            await cronIntegration.Invoke();
         }
     }
+}
+
+public abstract class CronIntegration(IMqttConnectionService mqtt) : Integration(mqtt), IInvocable
+{
+    public abstract string CronExpression { get; }
+    public abstract Task Invoke();
+}
+
+public abstract class MqttIntegration(IMqttConnectionService mqtt) : Integration(mqtt)
+{
+    public abstract string Topic { get; }
+    public abstract Task Invoke(MqttApplicationMessage messageApplicationMessage);
 }

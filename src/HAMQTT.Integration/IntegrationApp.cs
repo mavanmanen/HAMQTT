@@ -2,6 +2,7 @@ using System.Reflection;
 using Coravel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using ToMqttNet;
 
 namespace HAMQTT.Integration;
@@ -24,6 +25,7 @@ internal class IntegrationApp(string nodeId, string host, int? port, string user
             options.Password = password;
         });
         builder.Services.AddScheduler();
+        builder.Services.AddSingleton<SubscriptionManager>();
         return builder;
     }
 
