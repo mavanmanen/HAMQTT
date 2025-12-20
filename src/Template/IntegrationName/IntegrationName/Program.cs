@@ -4,11 +4,10 @@ using IntegrationName;
 var host = Environment.GetEnvironmentVariable("MQTT_HOST");
 var username = Environment.GetEnvironmentVariable("MQTT_USERNAME");
 var password = Environment.GetEnvironmentVariable("MQTT_PASSWORD");
-var nodeId = Environment.GetEnvironmentVariable("MQTT_NODE_ID");
 
 var builder = new IntegrationAppBuilder()
     .WithHost(host)
-    .WithNodeId(nodeId)
+    .WithNodeId("MQTT_INTEGRATION_INTEGRATION_NAME")
     .WithCredentials(username, password)
     .WithStartup<Startup>();
 
