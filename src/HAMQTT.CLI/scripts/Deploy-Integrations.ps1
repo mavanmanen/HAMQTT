@@ -97,7 +97,6 @@ foreach ($dir in $Integrations)
     network_mode: bridge
     environment:
       <<: *environment
-`r`n
 "@
 
     $envFilePath = Join-Path $dir.FullName ".env"
@@ -106,6 +105,7 @@ foreach ($dir in $Integrations)
     {
         $ServicesYaml += "`r`n      " + ($line -replace "=", ": ")
     }
+    $ServicesYaml += "`r`n`r`n"
 }
 
 $FinalCompose = @"
