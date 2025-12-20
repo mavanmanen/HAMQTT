@@ -97,8 +97,7 @@ foreach ($dir in $Integrations)
     network_mode: bridge
     environment:
       <<: *environment
-
-
+`r`n
 "@
 
     $envFilePath = Join-Path $dir.FullName ".env"
