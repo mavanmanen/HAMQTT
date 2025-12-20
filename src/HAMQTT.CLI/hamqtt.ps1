@@ -135,7 +135,7 @@ switch ($Context)
                 dotnet new update
             }
             "remove" {
-                dWrite-Host "🗑️ Removing template..." -ForegroundColor Cyan
+                Write-Host "🗑️ Removing template..." -ForegroundColor Cyan
                 dotnet new uninstall $PackageId
             }
             Default {
